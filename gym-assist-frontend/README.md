@@ -155,11 +155,77 @@ O objetivo do Gym Assist é ser um parceiro de treino para o usuário, proporcio
 
 ---
 
-## Anexo B: Informações do Template (React + Vite)
+## Anexo B: P.R.E.V.C. - Fase de Planejamento
+
+_(Esta seção detalha a arquitetura, tecnologias e estrutura inicial propostas no início do projeto.)_
+
+#### 1. Arquitetura do Sistema
+
+Proponho uma arquitetura de micro-serviços desacoplada, o que nos dará flexibilidade para escalar e manter o sistema no futuro.
+
+- **Frontend:** Uma Single Page Application (SPA). Ele será responsável por toda a interface visual e interação com o usuário.
+- **Backend:** Uma API RESTful. O backend será o cérebro da aplicação, responsável pelas regras de negócio, autenticação de usuários, e comunicação com o banco de dados.
+- **Banco de Dados:** Um banco de dados relacional (SQL).
+- **Serviço de IA (para análise de exercícios):** Este será um serviço separado. Quando um usuário cadastrar um novo exercício, o backend enviará os dados para este serviço, que fará a análise e retornará os grupos musculares associados.
+
+#### 2. Tecnologias Propostas (Tech Stack)
+
+- **Frontend:**
+  - **Framework:** React (com Vite).
+  - **Linguagem:** TypeScript.
+  - **Estilização:** Styled-components ou Tailwind CSS.
+- **Backend:**
+  - **Plataforma:** Node.js com o framework Express.js.
+  - **Linguagem:** TypeScript.
+- **Banco de Dados:**
+  - **SGBD:** PostgreSQL.
+- **Autenticação:**
+  - **Método:** JWT (JSON Web Tokens).
+
+#### 3. Estrutura de Arquivos Inicial (Frontend)
+
+gym-assist-frontend/
+├── public/
+│ └── index.html
+└── src/
+├── assets/
+│ └── images/
+│ └── fonts/
+├── components/
+│ ├── common/ // Botões, Inputs, Cards genéricos
+│ └── layout/ // Header, Sidebar, Footer
+├── constants/
+│ └── theme.js // Aqui definiremos nossa paleta de cores
+├── mocks/
+│ └── userMocks.js // Dados falsos para desenvolvimento inicial
+├── pages/
+│ ├── Login.jsx
+│ ├── Dashboard.jsx
+│ ├── MyTraining.jsx
+│ └── WorkoutPlayer.jsx // A tela de execução do treino
+├── services/
+│ └── api.js // Configuração da comunicação com o backend
+├── styles/
+│ └── GlobalStyles.js // Estilos globais da aplicação
+├── App.jsx
+└── main.jsx
+
+#### 4. Definição do MVP (Mínimo Produto Viável)
+
+Proponho o seguinte para a nossa primeira fase de Execução:
+
+- **Autenticação:** Telas de Login e Cadastro.
+- **Dashboard Principal:** Uma visão geral para o usuário logado.
+- **Visualização de Treino Ativo:** O usuário poderá ver seu treino, séries e os exercícios de cada série.
+- **Montagem de Séries:** Permitir que o usuário crie uma nova "Série", adicionando exercícios de uma lista pré-definida (usaremos dados "mock" nesta fase).
+
+---
+
+## Anexo C: Informações do Template (React + Vite)
 
 Este template fornece uma configuração mínima para o React funcionar no Vite com HMR e algumas regras do ESLint.
 
 Plugins oficiais disponíveis:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) usa [Babel](https://babeljs.io/) para Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) usa [SWC](https://swc.rs/) para Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) usa [SWC](https.swc.rs/) para Fast Refresh
