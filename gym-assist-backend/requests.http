@@ -1,0 +1,47 @@
+### Cadastrar um novo usuário
+POST http://localhost:3001/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Usuário Teste",
+  "email": "teste@email.com",
+  "password": "senha123"
+}
+
+### Fazer login com o usuário criado
+POST http://localhost:3001/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "postman@email.com",
+  "password": "senha123"
+}
+
+### Buscar o perfil do usuário (requer autenticação)
+@authToken = {{login.response.body.token}}
+
+GET http://localhost:3001/api/profile
+Authorization: Bearer {{authToken}}
+
+
+###
+#
+# Para testar PUT e DELETE, primeiro execute a requisição POST para criar um exercício
+# e copie o "id" que ele retorna na resposta.
+# Cole o ID na URL das requisições abaixo.
+#
+###
+
+### Atualizar um exercício customizado (troque :id pelo ID real)
+PUT http://localhost:3001/api/exercises/custom/1d0b4dc5-3e1c-46b5-926e-a77431a4ce1c
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "TESTE111",
+  "muscleGroupId": "b7c201ca-e8f3-4d66-8206-9a53f006c654"
+}
+
+### Deletar um exercício customizado (troque :id pelo ID real)
+DELETE http://localhost:3001/api/exercises/custom/COLE_O_ID_DO_EXERCICIO_AQUI
+Authorization: Bearer {{authToken}}

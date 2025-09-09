@@ -1,0 +1,85 @@
+export const activeTrainingMock = {
+  id: "treino01",
+  name: "Foco em Hipertrofia - ABC",
+  sequencingMode: "loop",
+  lastCompletedSeriesId: "serieB",
+  schedule: {
+    monday: "serieA",
+    tuesday: null,
+    wednesday: "serieB",
+    thursday: null,
+    friday: "serieA",
+    saturday: null,
+    sunday: null,
+  },
+  series: [
+    {
+      id: "serieA",
+      name: "Série A - Peito, Tríceps e Ombro",
+      exercises: [
+        {
+          id: "ex01",
+          name: "Supino Reto",
+          sets: 4,
+          reps: "8-12",
+          lastLoad: "80kg",
+        },
+        {
+          id: "ex02",
+          name: "Supino Inclinado com Halteres",
+          sets: 4,
+          reps: "10",
+          lastLoad: "28kg",
+        },
+        {
+          id: "ex03",
+          name: "Desenvolvimento Militar",
+          sets: 4,
+          reps: "10",
+          lastLoad: "40kg",
+        },
+        {
+          id: "ex04",
+          name: "Tríceps na Polia",
+          sets: 3,
+          reps: "15",
+          lastLoad: "25kg",
+        },
+      ],
+    },
+    {
+      id: "serieB",
+      name: "Série B - Costas e Bíceps",
+      exercises: [
+        {
+          id: "ex05",
+          name: "Barra Fixa",
+          sets: 4,
+          reps: "Falha",
+          lastLoad: "BW",
+        },
+        {
+          id: "ex06",
+          name: "Remada Curvada",
+          sets: 4,
+          reps: "10",
+          lastLoad: "60kg",
+        },
+        {
+          id: "ex07",
+          name: "Puxada Frontal",
+          sets: 4,
+          reps: "12",
+          lastLoad: "55kg",
+        },
+        {
+          id: "ex08",
+          name: "Rosca Direta",
+          sets: 3,
+          reps: "12",
+          lastLoad: "14kg",
+        },
+      ],
+    },
+  ],
+};
