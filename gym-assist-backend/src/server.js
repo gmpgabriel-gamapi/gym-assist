@@ -7,7 +7,8 @@ const profileRoutes = require("./routes/profileRoutes");
 const exerciseRoutes = require("./routes/exerciseRoutes");
 const muscleGroupRoutes = require("./routes/muscleGroupRoutes");
 const associationRoutes = require("./routes/associationRoutes");
-const seriesRoutes = require("./routes/seriesRoutes"); // Importa
+const seriesRoutes = require("./routes/seriesRoutes");
+const trainingPlanRoutes = require("./routes/trainingPlanRoutes"); // 1. Importa
 
 const app = express();
 app.use(cors());
@@ -22,7 +23,8 @@ app.use("/api/profile", profileRoutes);
 app.use("/api/exercises", exerciseRoutes);
 app.use("/api/muscle-groups", muscleGroupRoutes);
 app.use("/api/associations", associationRoutes);
-app.use("/api/series", seriesRoutes); // Usa
+app.use("/api/series", seriesRoutes);
+app.use("/api/training-plans", trainingPlanRoutes); // 2. Usa
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
