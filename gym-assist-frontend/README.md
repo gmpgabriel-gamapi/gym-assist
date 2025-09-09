@@ -168,7 +168,39 @@ Proponho uma arquitetura de micro-serviços desacoplada, o que nos dará flexibi
 - **Banco de Dados:** Um banco de dados relacional (SQL).
 - **Serviço de IA (para análise de exercícios):** Este será um serviço separado. Quando um usuário cadastrar um novo exercício, o backend enviará os dados para este serviço, que fará a análise e retornará os grupos musculares associados.
 
-#### 2. Tecnologias Propostas (Tech Stack)
+#### 2. Identidade Visual
+
+- **Tema Sugerido:** - Um tema "Dark Mode First" (Modo Escuro como Padrão). Ambientes de academia geralmente têm iluminação variada, e um tema escuro é mais confortável aos olhos e ajuda a destacar os elementos importantes da interface, como cronômetros e dados do exercício. Poderemos, claro, oferecer um tema claro como opção nas configurações.
+- **Paletas de Cores:**
+  - **Foco e Saúde:**
+    - **Fundo Principal:** - Azul marinho muito escuro (ex: #1A202C).
+    - **Elementos de Interface:** - Um azul acinzentado (ex: #2D3748).
+    - **Cor de Destaque:** - Verde menta ou ciano (ex: #38B2AC). Essa paleta transmite uma sensação de saúde e tecnologia, menos "agressiva" que a primeira.
+- **Tipografia** - Para garantir legibilidade e uma aparência moderna, sugiro a seguinte combinação de fontes (disponíveis gratuitamente no Google Fonts):
+  - **Títulos e Destaques:** - Montserrat - Uma fonte moderna e geométrica, com boa presença.
+  - **Textos e Parágrafos:** - Lato ou Roboto - Fontes extremamente legíveis em qualquer tamanho, ideais para exibir dados e instruções.
+  - **Texto:** - Branco ou um cinza claro.
+
+### 3. Proposta de Valor
+
+O "Gym Assist" se diferencia por unir simplicidade e poder em uma única plataforma. Nosso objetivo é ir além de um simples rastreador de exercícios, atuando como um verdadeiro **parceiro de treino digital**. A interface intuitiva e a funcionalidade principal "Meu Treino" são projetadas para guiar o usuário de forma eficaz, enquanto relatórios detalhados de performance oferecem insights valiosos para a otimização contínua dos resultados.
+
+### 4. Jornada do Usuário
+
+A aplicação é projetada para atender a dois perfis principais de usuários:
+
+- **Usuário Iniciante:** Pode ser facilmente integrado à plataforma por seu instrutor ou começar de forma independente, utilizando exercícios base e a funcionalidade guiada "Meu Treino" para construir uma rotina sólida.
+- **Usuário Avançado:** Encontra no "Gym Assist" uma ferramenta poderosa para executar seus treinos personalizados com máxima eficiência e para analisar seu progresso através de métricas avançadas, como volume loading e frequência de grupos musculares trabalhados.
+
+### 5. Visão de Futuro (Roadmap)
+
+O projeto "Gym Assist" é concebido como uma plataforma em constante evolução. Os próximos passos estratégicos incluem:
+
+- **Integração Academia-Usuário:** Criação de um canal para comunicação, promoções e informativos.
+- **Expansão para Múltiplas Plataformas:** Desenvolvimento de versões para aplicativos mobile (iOS/Android) e smartwatches.
+- **Assistente com IA:** Integração de uma Inteligência Artificial para comunicação e orientação via webhooks (WhatsApp, Telegram, etc.).
+
+#### 6. Tecnologias Propostas (Tech Stack)
 
 - **Frontend:**
   - **Framework:** React (com Vite).
@@ -182,7 +214,7 @@ Proponho uma arquitetura de micro-serviços desacoplada, o que nos dará flexibi
 - **Autenticação:**
   - **Método:** JWT (JSON Web Tokens).
 
-#### 3. Estrutura de Arquivos Inicial (Frontend)
+#### 7. Estrutura de Arquivos Inicial (Frontend)
 
 gym-assist-frontend/
 ├── public/
@@ -210,7 +242,7 @@ gym-assist-frontend/
 ├── App.jsx
 └── main.jsx
 
-#### 4. Definição do MVP (Mínimo Produto Viável)
+#### 8. Definição do MVP (Mínimo Produto Viável)
 
 Proponho o seguinte para a nossa primeira fase de Execução:
 
