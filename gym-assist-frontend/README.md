@@ -244,12 +244,61 @@ gym-assist-frontend/
 
 #### 8. Definição do MVP (Mínimo Produto Viável)
 
-Proponho o seguinte para a nossa primeira fase de Execução:
+    Documento de Escopo: Produto Mínimo Viável (MVP) do Gym Assist
+    Versão: 1.0
+    Data: 10 de Setembro de 2025
+    Propósito: Este documento detalha o escopo de funcionalidades para a primeira versão do "Gym Assist". O objetivo deste MVP é entregar um produto funcional que materialize a proposta de valor central do projeto: atuar como um "parceiro de treino digital" simples, poderoso e flexível.
 
-- **Autenticação:** Telas de Login e Cadastro.
-- **Dashboard Principal:** Uma visão geral para o usuário logado.
-- **Visualização de Treino Ativo:** O usuário poderá ver seu treino, séries e os exercícios de cada série.
-- **Montagem de Séries:** Permitir que o usuário crie uma nova "Série", adicionando exercícios de uma lista pré-definida (usaremos dados "mock" nesta fase).
+    Módulos de Funcionalidades
+    Módulo 1: Fundamento e Gestão de Usuário
+    O alicerce do sistema, garantindo que cada usuário tenha uma identidade, segurança e um espaço pessoal dentro da aplicação.
+
+    1.1. Cadastro de Usuário: Implementação de uma tela de cadastro que permita a um novo usuário criar sua conta pessoal de forma segura, fornecendo informações essenciais como nome, e-mail e senha.
+
+    1.2. Autenticação de Usuário: Desenvolvimento de uma tela de login para que usuários registrados possam acessar a plataforma. Inclui um mecanismo seguro de logout para encerrar a sessão.
+
+    1.3. Perfil do Usuário (Simplificado): Uma área básica e acessível dentro do aplicativo onde o usuário possa visualizar as informações da sua conta.
+
+    Módulo 2: Biblioteca de Exercícios (Conteúdo Central)
+    A base de conhecimento da aplicação, contendo todos os exercícios que podem ser utilizados para montar séries e treinos.
+
+    2.1. Visualização e Busca: Uma interface clara para o usuário navegar por uma lista de exercícios pré-cadastrados no sistema. Deve incluir uma funcionalidade de busca por nome.
+
+    2.2. Filtro por Grupo Muscular: Ferramenta essencial que permite ao usuário filtrar a biblioteca de exercícios por grupos musculares específicos (ex: Peito, Costas, Pernas, etc.), facilitando a montagem de treinos.
+
+    2.3. Detalhes do Exercício: Uma tela de visualização para cada exercício, contendo seu nome, descrição detalhada das instruções de execução e um espaço designado para uma futura imagem ou GIF.
+
+    Módulo 3: Criação de Séries (Agrupador de Exercícios)
+    O primeiro nível de personalização, onde o usuário agrupa exercícios da biblioteca para formar uma rotina de treino específica e reutilizável.
+
+    3.1. Gestão de Séries: Uma área dedicada onde o usuário pode criar, visualizar, editar e deletar suas próprias séries (ex: "Série A - Foco em Peito", "Série de Aquecimento").
+
+    3.2. Adição/Remoção de Exercícios: Dentro do editor de uma série, o usuário terá a capacidade de navegar e selecionar exercícios da Biblioteca (Módulo 2) para compor a rotina.
+
+    3.3. Definição de Parâmetros: Para cada exercício adicionado a uma série, o usuário poderá especificar os parâmetros de execução: número de séries (sets), faixa de repetições (reps) e o tempo de descanso recomendado.
+
+    Módulo 4: Montagem de Treinos (Agrupador de Séries)
+    O segundo nível de personalização, permitindo que o usuário organize suas séries em um plano de treino estruturado (ex: semanal).
+
+    4.1. Gestão de Treinos: Uma interface para o usuário criar, visualizar, editar e deletar seus planos de treino (ex: "Treino de Hipertrofia ABC", "Plano de 5 dias").
+
+    4.2. Associação de Séries: Funcionalidade que permite ao usuário selecionar as séries criadas no Módulo 3 e associá-las ao seu plano de treino, organizando a estrutura (ex: Segunda-feira: Série A, Terça-feira: Série B, etc.).
+
+    Módulo 5: Execução de Treino ("Meu Treino")
+    O coração da aplicação. A experiência interativa e guiada que atua como o "parceiro de treino" durante a atividade física.
+
+    5.1. Seleção de Série do Dia: Interface inicial onde o usuário escolhe seu plano de treino ativo e, em seguida, seleciona qual série específica daquele plano ele deseja executar na sessão atual.
+
+    5.2. Interface de Treino Guiado: Uma tela imersiva e focada que guia o usuário exercício por exercício dentro da série escolhida. Esta interface permitirá a flexibilidade de adicionar ou remover exercícios durante a execução, garantindo que o treino se adapte à necessidade do momento.
+
+    5.3. Resumo Pós-Série: Ao finalizar a sessão, uma tela de resumo será exibida, parabenizando o usuário e mostrando os resultados gerais do treino recém-concluído.
+
+    Módulo 6: Histórico de Atividades (Básico)
+    O diário de bordo do usuário, registrando de forma precisa o progresso real e servindo como fonte de motivação e análise.
+
+    6.1. Diário de Treino (Log de Sessões): Uma tela que exibe uma lista cronológica de todas as sessões de treino finalizadas pelo usuário, funcionando como um log de atividades.
+
+    6.2. Registro Fiel da Sessão (Snapshot): Ao selecionar um item do diário, o sistema exibirá um registro fiel e imutável (snapshot) do que foi efetivamente realizado naquela sessão. Este registro é independente da série original e detalha todos os exercícios feitos (incluindo os adicionados na hora), os pesos exatos, séries e repetições de cada um, fornecendo um histórico preciso do esforço real.
 
 ---
 
