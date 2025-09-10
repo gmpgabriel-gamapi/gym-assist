@@ -1,5 +1,6 @@
+// [FRONTEND] arquivo: src/pages/Login.jsx (VERSÃO FINAL CORRIGIDA)
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom"; // ADIÇÃO: Importa o Link
 import styled from "styled-components";
 import { useAuth } from "../context/AuthContext";
 
@@ -70,6 +71,25 @@ const ErrorMessage = styled.p`
   margin: 0;
 `;
 
+// --- ADIÇÃO INICIA ---
+// Componente estilizado para agrupar os links de navegação
+const LinksWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-top: ${({ theme }) => theme.spacing.small};
+
+  a {
+    color: ${({ theme }) => theme.colors.textSecondary};
+    text-decoration: none;
+    font-size: 0.9rem;
+
+    &:hover {
+      color: ${({ theme }) => theme.colors.primary};
+    }
+  }
+`;
+// --- ADIÇÃO TERMINA ---
+
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -116,6 +136,11 @@ function Login() {
         <Button type="submit" disabled={isLoading}>
           {isLoading ? "Entrando..." : "Entrar"}
         </Button>
+        {/* --- ADIÇÃO: Links de navegação --- */}
+        <LinksWrapper>
+          <Link to="/register">Criar uma conta</Link>
+          <Link to="/forgot-password">Esqueceu a senha?</Link>
+        </LinksWrapper>
       </LoginForm>
     </LoginWrapper>
   );

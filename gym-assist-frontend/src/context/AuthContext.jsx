@@ -1,3 +1,4 @@
+// [FRONTEND] arquivo: gym-assist-frontend/src/context/AuthContext.jsx (VERSÃO COMPLETA E CORRIGIDA)
 import {
   createContext,
   useState,
@@ -5,7 +6,10 @@ import {
   useContext,
   useCallback,
 } from "react";
-import { login as apiLogin } from "../services/authService";
+import {
+  login as apiLogin,
+  register as apiRegister,
+} from "../services/authService";
 import { getProfile } from "../services/profileService";
 import { teacherUserMock } from "../mocks/userMocks";
 
@@ -40,6 +44,7 @@ export function AuthProvider({ children }) {
     fetchAndSetUser();
   }, [fetchAndSetUser]);
 
+  // LÓGICA DE LOGIN ORIGINAL RESTAURADA
   const login = async (email, password) => {
     try {
       const data = await apiLogin(email, password);
@@ -60,6 +65,16 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // NOVA LÓGICA DE REGISTRO
+  const register = async (name, email, password) => {
+    try {
+      const data = await apiRegister(name, email, password);
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  };
+
   const refetchUser = async () => {
     await fetchAndSetUser();
   };
@@ -68,6 +83,7 @@ export function AuthProvider({ children }) {
     user,
     loading,
     login,
+    register,
     logout,
     isAuthenticated: !!user,
     volume,
