@@ -259,14 +259,19 @@ gym-assist-frontend/
 
     1.3. Perfil do Usuário (Simplificado): Uma área básica e acessível dentro do aplicativo onde o usuário possa visualizar as informações da sua conta.
 
-    Módulo 2: Biblioteca de Exercícios (Conteúdo Central)
+    Módulo 2: Biblioteca de Exercícios (Conteúdo Central, Dinâmica e Personalizada)
+    Um hub central para todos os exercícios, tanto os pré-carregados ("Base") quanto os criados pelos diferentes usuários, com funcionalidades de gestão.
     A base de conhecimento da aplicação, contendo todos os exercícios que podem ser utilizados para montar séries e treinos.
 
-    2.1. Visualização e Busca: Uma interface clara para o usuário navegar por uma lista de exercícios pré-cadastrados no sistema. Deve incluir uma funcionalidade de busca por nome.
+    2.1. Visualização Unificada e Filtros: Uma tela que exibe uma lista combinada de exercícios de todas as fontes disponíveis para o usuário (Base, seus próprios exercícios, do seu professor, da sua academia). A interface deverá permitir filtrar por grupo muscular e pela origem do exercício. Deve incluir uma funcionalidade de busca por nome.
 
-    2.2. Filtro por Grupo Muscular: Ferramenta essencial que permite ao usuário filtrar a biblioteca de exercícios por grupos musculares específicos (ex: Peito, Costas, Pernas, etc.), facilitando a montagem de treinos.
+    2.2. Gestão de Exercícios Customizados: Funcionalidade completa de criar, editar e deletar os exercícios customizados que pertencem ao próprio usuário.
 
-    2.3. Detalhes do Exercício: Uma tela de visualização para cada exercício, contendo seu nome, descrição detalhada das instruções de execução e um espaço designado para uma futura imagem ou GIF.
+    2.3. Filtro por Grupo Muscular: Ferramenta essencial que permite ao usuário filtrar a biblioteca de exercícios por grupos musculares específicos (ex: Peito, Costas, Pernas, etc.), facilitando a montagem de treinos.
+
+    2.4. Detalhes do Exercício: Uma tela de visualização para cada exercício, contendo seu nome, descrição detalhada das instruções de execução e um espaço designado para uma futura imagem ou GIF.
+
+    2.5. Controle de Visibilidade: Uma opção para o usuário "esconder" ou "mostrar" grupos de exercícios (ex: ocultar todos os exercícios Base da lista principal).
 
     Módulo 3: Criação de Séries (Agrupador de Exercícios)
     O primeiro nível de personalização, onde o usuário agrupa exercícios da biblioteca para formar uma rotina de treino específica e reutilizável.
@@ -299,6 +304,70 @@ gym-assist-frontend/
     6.1. Diário de Treino (Log de Sessões): Uma tela que exibe uma lista cronológica de todas as sessões de treino finalizadas pelo usuário, funcionando como um log de atividades.
 
     6.2. Registro Fiel da Sessão (Snapshot): Ao selecionar um item do diário, o sistema exibirá um registro fiel e imutável (snapshot) do que foi efetivamente realizado naquela sessão. Este registro é independente da série original e detalha todos os exercícios feitos (incluindo os adicionados na hora), os pesos exatos, séries e repetições de cada um, fornecendo um histórico preciso do esforço real.
+
+#### 9. Documento de Visão de Longo Prazo: O Futuro do Gym Assist (Pós-MVP)
+
+    Versão: 1.1
+    Data: 10 de Setembro de 2025
+    Propósito: Este documento serve como um guia estratégico para a evolução do "Gym Assist" após o lançamento bem-sucedido do Produto Mínimo Viável (MVP). Ele delineia as futuras fases de desenvolvimento, projetadas para expandir a plataforma de uma ferramenta de treino pessoal para um ecossistema de fitness completo, social e inteligente.
+
+    Fases de Evolução Pós-MVP
+    Fase 2: Análise de Desempenho e Personalização Avançada
+    O foco desta fase é enriquecer a experiência do usuário individual, transformando os dados coletados em insights acionáveis e aumentando as opções de personalização.
+
+    2.1. Relatórios Avançados e Dashboard de Performance:
+
+    Descrição: Implementação de uma seção de análise visual detalhada, com gráficos interativos que ilustram a progressão de métricas como Volume Loading (carga total levantada), recordes pessoais (PRs) por exercício, e a frequência de treino por grupo muscular.
+
+    Valor: Capacita o usuário com dados concretos para otimizar seus treinos e visualizar seu progresso de forma clara e motivadora.
+
+    2.2. Metas e Conquistas (Gamificação):
+
+    Descrição: Introdução de um sistema que permite aos usuários definir metas personalizadas (ex: frequência semanal, volume total) e desbloquear conquistas (badges) por sua consistência e desempenho.
+
+    Valor: Aumenta o engajamento e a retenção a longo prazo, adicionando uma camada de motivação e diversão à jornada de fitness.
+
+    Fase 3: Ecossistema e Interação Social
+    Nesta fase, expandimos o "Gym Assist" para se conectar com profissionais, outras plataformas e a comunidade, construindo um verdadeiro ecossistema.
+
+    3.1. Funcionalidades para Personal Trainers e Academias (Sistema de Papéis):
+
+    Descrição: Em vez de um portal separado, evoluiremos o "Gym Assist" para suportar diferentes papéis de usuário (Aluno, Trainer, Academia) dentro da mesma aplicação unificada. Isso incluirá o desenvolvimento de telas específicas por papel (ex: um painel "Meus Alunos" para trainers) e a adaptação de funcionalidades existentes para diferentes contextos, com forte ênfase na reutilização de componentes de UI (ex: o mesmo editor de séries será usado por um aluno para si mesmo ou por um trainer para um aluno).
+
+    Valor: Integra os profissionais de fitness ao ecossistema, cria novas oportunidades de negócio (B2B) e melhora a experiência do aluno ao conectar sua vida na academia com a digital.
+
+    3.2. Integração com APIs de Saúde:
+
+    Descrição: Sincronização de dados com as principais plataformas de saúde do mercado, como Google Fit e Apple Health, permitindo um fluxo de informações de atividades físicas, calorias, entre outros.
+
+    Valor: Posiciona o "Gym Assist" como uma peça central no ecossistema de saúde e bem-estar do usuário.
+
+    3.3. Funcionalidades Sociais:
+
+    Descrição: Implementação de recursos que permitem aos usuários adicionar amigos, compartilhar seus treinos e conquistas em um feed de atividades, e interagir com a comunidade.
+
+    Valor: Fortalece a retenção de usuários através da criação de uma comunidade engajada e de apoio mútuo.
+
+    Fase 4: Expansão para Novas Plataformas e Inteligência Artificial
+    A fase final da visão, que torna o "Gym Assist" onipresente em todos os dispositivos do usuário e o transforma em um assistente proativo e inteligente.
+
+    4.1. Aplicativo Mobile Nativo (iOS & Android):
+
+    Descrição: Desenvolvimento de aplicativos mobile completos e otimizados para smartphones, aproveitando recursos nativos para oferecer a melhor experiência de usuário possível.
+
+    Valor: Atende à principal necessidade do público-alvo, que é ter a ferramenta de treino acessível no bolso, dentro da academia.
+
+    4.2. Aplicativo para Smartwatch:
+
+    Descrição: Criação de um aplicativo complementar para smartwatches (Apple Watch, etc.), focado na execução de treinos. O usuário poderá visualizar exercícios, registrar séries/repetições/cargas e controlar o cronômetro de descanso diretamente do pulso.
+
+    Valor: Oferece o máximo de conveniência e foco durante a atividade física, eliminando a distração do smartphone.
+
+    4.3. Assistente de Treino com IA:
+
+    Descrição: Integração de um assistente virtual inteligente que analisa o histórico do usuário para fornecer sugestões proativas, insights de performance e alertas. A comunicação poderá ser feita via chatbots no app ou por webhooks com plataformas como WhatsApp e Telegram.
+
+    Valor: Concretiza a visão final do "parceiro de treino", oferecendo orientação personalizada e inteligente que se adapta à jornada do usuário.
 
 ---
 
