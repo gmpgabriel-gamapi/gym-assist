@@ -371,7 +371,72 @@ gym-assist-frontend/
 
 ---
 
-## Anexo C: Informações do Template (React + Vite)
+## Anexo C: Etapa Atual
+
+    Plano de Execução: Ciclo 1 - Módulo 1 (Fundamento e Gestão de Usuário)
+    Objetivo do Ciclo: Implementar a interface de usuário (UI) e o fluxo de navegação completo para o cadastro, login e perfil do usuário. Ao final deste ciclo, teremos um protótipo clicável de todo o fluxo de autenticação, funcionando com dados mock, sem depender do backend.
+
+    Tecnologias Frontend: React, Vite, react-router-dom.
+
+    Tarefa 1: Estrutura de Rotas e Páginas
+    Ação: Criar a estrutura de arquivos para as novas páginas e configurar o roteamento principal da aplicação.
+
+    Detalhes:
+
+    No App.jsx ou em um arquivo de rotas dedicado, definir as seguintes rotas:
+
+    /login -> Página de Login
+
+    /cadastro -> Página de Cadastro
+
+    /perfil -> Página de Perfil (será uma rota protegida futuramente)
+
+    / ou /dashboard -> Página principal da aplicação após o login.
+
+    Criar os arquivos de componente vazios para cada página: src/pages/Register.jsx e src/pages/Profile.jsx.
+
+    Tarefa 2: Desenvolvimento da Página de Cadastro (/cadastro)
+    Ação: Construir o formulário e a interface da página de cadastro.
+
+    Detalhes:
+
+    Criar um componente de formulário reutilizável (ex: src/components/RegisterForm.jsx).
+
+    O formulário deve conter os campos: Nome, E-mail, Senha e Confirmar Senha.
+
+    Implementar validações básicas no lado do cliente (ex: campos obrigatórios, formato de e-mail, senhas coincidem).
+
+    Ao submeter o formulário com sucesso, a função de callback irá, por enquanto, apenas exibir os dados no console (console.log(formData)).
+
+    Adicionar um link de navegação para a página de Login (ex: "Já tem uma conta? Faça login").
+
+    Tarefa 3: Revisão e Finalização da Página de Login (/login)
+    Ação: Garantir que a página de login existente esteja alinhada e funcional (com dados mock).
+
+    Detalhes:
+
+    Revisar o componente src/components/Login/LoginForm.jsx.
+
+    Assim como no cadastro, ao submeter o formulário, a função de callback exibirá os dados no console (console.log(credentials)).
+
+    Após a submissão, simularemos um login bem-sucedido e redirecionaremos o usuário para a página principal (/dashboard).
+
+    Garantir que haja um link de navegação para a página de Cadastro.
+
+    Tarefa 4: Desenvolvimento da Página de Perfil (/perfil)
+    Ação: Criar uma página simples para exibir os dados do usuário (mock) e permitir o logout.
+
+    Detalhes:
+
+    A página exibirá informações de um usuário estático (mock), por exemplo: "Nome: Usuário de Teste", "Email: teste@gymassist.com".
+
+    Implementar um botão de "Sair" (Logout).
+
+    A ação de logout irá simular o fim da sessão e redirecionar o usuário de volta para a página de login (/login).
+
+---
+
+## Anexo D: Informações do Template (React + Vite)
 
 Este template fornece uma configuração mínima para o React funcionar no Vite com HMR e algumas regras do ESLint.
 
