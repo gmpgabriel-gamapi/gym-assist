@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo } from "react";
+// [FRONTEND] arquivo: src/pages/Exercises.jsx (MODIFICADO)
+import { useState, useEffect, useMemo, useCallback } from "react";
 import styled from "styled-components";
 import {
   getAllExercises,
@@ -9,6 +10,9 @@ import {
 import { getMuscleGroups } from "../services/muscleGroupService";
 import ExerciseFormModal from "../components/exercises/ExerciseFormModal";
 import CustomDropdown from "../components/common/CustomDropdown";
+import TypeFilterToggle from "../components/exercises/TypeFilterToggle";
+import VideoPlayerModal from "../components/common/VideoPlayerModal";
+import DescriptionModal from "../components/common/DescriptionModal"; // 1. Importa o novo modal
 
 const PageWrapper = styled.div`
   width: 100%;
@@ -43,17 +47,25 @@ const PrimaryButton = styled.button`
 
 const FiltersWrapper = styled.div`
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: ${({ theme }) => theme.spacing.medium};
   margin-bottom: ${({ theme }) => theme.spacing.large};
   background-color: ${({ theme }) => theme.colors.background};
   padding: ${({ theme }) => theme.spacing.large};
   border-radius: 8px;
+  align-items: stretch;
+`;
+
+const FilterRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: ${({ theme }) => theme.spacing.medium};
   align-items: center;
 `;
 
 const SearchInput = styled.input`
-  flex: 1 1 200px;
+  flex: 1;
+  max-width: 450px;
   background-color: ${({ theme }) => theme.colors.surface};
   border: 1px solid ${({ theme }) => theme.colors.surfaceHover};
   color: ${({ theme }) => theme.colors.text};
@@ -67,7 +79,7 @@ const ExerciseList = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: ${({ theme }) => theme.spacing.medium};
-  justify-content: start; /* Garante alinhamento à esquerda em telas largas */
+  justify-content: start;
 `;
 
 const ExerciseCard = styled.div`
@@ -91,13 +103,39 @@ const CardHeader = styled.div`
   justify-content: space-between;
   align-items: flex-start;
   gap: ${({ theme }) => theme.spacing.small};
+`;
+
+const ExerciseNameWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.small};
   flex: 1;
+  min-width: 0;
 `;
 
 const ExerciseName = styled.strong`
   color: ${({ theme }) => theme.colors.text};
   font-size: 1.1rem;
-  padding-right: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+const IconButton = styled.button`
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  color: ${({ theme }) => theme.colors.primary};
+  text-decoration: none;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: scale(1.2);
+  }
 `;
 
 const TypeTag = styled.span`
@@ -112,12 +150,42 @@ const TypeTag = styled.span`
   height: fit-content;
 `;
 
+const CardContent = styled.div`
+  margin-top: ${({ theme }) => theme.spacing.small};
+  flex-grow: 1;
+`;
+
+const ExerciseDescription = styled.p`
+  color: ${({ theme }) => theme.colors.textSecondary};
+  font-size: 0.9rem;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+`;
+
+const ReadMoreButton = styled.button`
+  background: none;
+  border: none;
+  color: ${({ theme }) => theme.colors.primary};
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: bold;
+  padding: 0;
+  margin-top: 4px;
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
 const ActionButtonGroup = styled.div`
   display: flex;
   gap: ${({ theme }) => theme.spacing.medium};
   align-items: center;
   padding-top: ${({ theme }) => theme.spacing.medium};
   border-top: 1px solid ${({ theme }) => theme.colors.surfaceHover};
+  margin-top: auto;
 `;
 
 const ActionButton = styled.button`
@@ -142,31 +210,46 @@ function Exercises() {
   const [editingExercise, setEditingExercise] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [muscleGroupFilter, setMuscleGroupFilter] = useState("all");
-  const [typeFilter, setTypeFilter] = useState("all");
+  const [selectedTypes, setSelectedTypes] = useState(() => {
+    try {
+      const savedTypes = localStorage.getItem("exerciseTypeFilter");
+      return savedTypes ? JSON.parse(savedTypes) : ["base", "custom"];
+    } catch (error) {
+      return ["base", "custom"];
+    }
+  });
+  const [playingVideoUrl, setPlayingVideoUrl] = useState(null);
+  // 2. Novo estado para o modal de descrição
+  const [viewingDescription, setViewingDescription] = useState(null);
 
   useEffect(() => {
-    const fetchPageData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const [exercisesData, muscleGroupsData] = await Promise.all([
-          getAllExercises(),
-          getMuscleGroups(),
-        ]);
-        setAllExercises(exercisesData);
-        const groupOptions = [
-          { value: "all", label: "Todos os Grupos" },
-          ...muscleGroupsData.map((g) => ({ value: g.id, label: g.name })),
-        ];
-        setMuscleGroups(groupOptions);
-      } catch (err) {
-        setError(err.message || "Falha ao buscar dados");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchPageData();
+    localStorage.setItem("exerciseTypeFilter", JSON.stringify(selectedTypes));
+  }, [selectedTypes]);
+
+  const fetchPageData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const [exercisesData, muscleGroupsData] = await Promise.all([
+        getAllExercises(),
+        getMuscleGroups(),
+      ]);
+      setAllExercises(exercisesData);
+      const groupOptions = [
+        { value: "all", label: "Todos os Grupos Musculares" },
+        ...muscleGroupsData.map((g) => ({ value: g.id, label: g.name })),
+      ];
+      setMuscleGroups(groupOptions);
+    } catch (err) {
+      setError(err.message || "Falha ao buscar dados");
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchPageData();
+  }, [fetchPageData]);
 
   const handleOpenCreateModal = () => {
     setEditingExercise(null);
@@ -216,7 +299,9 @@ function Exercises() {
 
   const filteredExercises = useMemo(() => {
     return allExercises
-      .filter((ex) => typeFilter === "all" || ex.type === typeFilter)
+      .filter(
+        (ex) => selectedTypes.length === 0 || selectedTypes.includes(ex.type)
+      )
       .filter((ex) => {
         if (muscleGroupFilter === "all") return true;
         return (
@@ -224,7 +309,7 @@ function Exercises() {
         );
       })
       .filter((ex) => ex.name.toLowerCase().includes(searchTerm.toLowerCase()));
-  }, [allExercises, searchTerm, muscleGroupFilter, typeFilter]);
+  }, [allExercises, searchTerm, muscleGroupFilter, selectedTypes]);
 
   if (loading) {
     return (
@@ -249,7 +334,6 @@ function Exercises() {
   }
 
   const typeOptions = [
-    { value: "all", label: "Todos os Tipos" },
     { value: "base", label: "Sistema" },
     { value: "custom", label: "Customizado" },
   ];
@@ -264,34 +348,55 @@ function Exercises() {
       </PageHeader>
 
       <FiltersWrapper>
-        <SearchInput
-          placeholder="Buscar por nome..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <CustomDropdown
-          options={muscleGroups}
-          value={muscleGroupFilter}
-          onChange={(option) => setMuscleGroupFilter(option.value)}
-          placeholder="Filtrar por Grupo"
-        />
-        <CustomDropdown
+        <TypeFilterToggle
           options={typeOptions}
-          value={typeFilter}
-          onChange={(option) => setTypeFilter(option.value)}
-          placeholder="Filtrar por Tipo"
+          selectedTypes={selectedTypes}
+          onChange={setSelectedTypes}
         />
+        <FilterRow>
+          <SearchInput
+            placeholder="Buscar por nome..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <CustomDropdown
+            options={muscleGroups}
+            value={muscleGroupFilter}
+            onChange={(option) => setMuscleGroupFilter(option.value)}
+          />
+        </FilterRow>
       </FiltersWrapper>
 
       <ExerciseList>
         {filteredExercises.map((ex) => (
           <ExerciseCard key={ex.id}>
             <CardHeader>
-              <ExerciseName>{ex.name}</ExerciseName>
+              <ExerciseNameWrapper>
+                {ex.video_url && (
+                  <IconButton
+                    onClick={() => setPlayingVideoUrl(ex.video_url)}
+                    title="Ver vídeo"
+                  >
+                    ▶️
+                  </IconButton>
+                )}
+                <ExerciseName title={ex.name}>{ex.name}</ExerciseName>
+              </ExerciseNameWrapper>
               <TypeTag type={ex.type}>
                 {ex.type === "base" ? "Sistema" : "Customizado"}
               </TypeTag>
             </CardHeader>
+            {ex.description && (
+              <CardContent>
+                <ExerciseDescription title={ex.description}>
+                  {ex.description}
+                </ExerciseDescription>
+                {/* 3. Lógica para o botão "Ver mais" */}
+                <ReadMoreButton onClick={() => setViewingDescription(ex)}>
+                  Ver mais
+                </ReadMoreButton>
+              </CardContent>
+            )}
             {ex.type === "custom" && (
               <ActionButtonGroup>
                 <ActionButton onClick={() => handleOpenEditModal(ex)}>
@@ -311,6 +416,22 @@ function Exercises() {
         onClose={handleCloseModal}
         onSubmit={handleFormSubmit}
         initialData={editingExercise}
+      />
+
+      <VideoPlayerModal
+        isOpen={!!playingVideoUrl}
+        onClose={() => setPlayingVideoUrl(null)}
+        videoUrl={playingVideoUrl}
+      />
+
+      {/* 4. Renderiza o novo modal de descrição */}
+      <DescriptionModal
+        isOpen={!!viewingDescription}
+        onClose={() => setViewingDescription(null)}
+        content={{
+          title: viewingDescription?.name,
+          text: viewingDescription?.description,
+        }}
       />
     </PageWrapper>
   );

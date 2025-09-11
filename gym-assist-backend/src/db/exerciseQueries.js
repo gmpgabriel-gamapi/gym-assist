@@ -1,9 +1,17 @@
+// [BACKEND] arquivo: src/db/exerciseQueries.js (MODIFICADO)
 const db = require("./index");
 
-const createCustomExercise = async ({ name, ownerId, muscleGroupId }) => {
+const createCustomExercise = async ({
+  name,
+  ownerId,
+  muscleGroupId,
+  description, // --- ADIÇÃO ---
+  videoUrl, // --- ADIÇÃO ---
+}) => {
   const { rows } = await db.query(
-    "INSERT INTO custom_exercises (name, owner_id, primary_muscle_group_id) VALUES ($1, $2, $3) RETURNING *",
-    [name, ownerId, muscleGroupId]
+    // --- MODIFICAÇÃO: Query atualizada para incluir os novos campos ---
+    "INSERT INTO custom_exercises (name, owner_id, primary_muscle_group_id, description, video_url) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+    [name, ownerId, muscleGroupId, description, videoUrl]
   );
   return rows[0];
 };
@@ -41,7 +49,6 @@ const findCustomByOwnerId = async (ownerId) => {
   return rows;
 };
 
-// --- NOVAS FUNÇÕES ---
 const findCustomById = async (exerciseId) => {
   const { rows } = await db.query(
     "SELECT * FROM custom_exercises WHERE id = $1",
@@ -50,10 +57,14 @@ const findCustomById = async (exerciseId) => {
   return rows[0];
 };
 
-const updateCustomExercise = async (exerciseId, { name, muscleGroupId }) => {
+const updateCustomExercise = async (
+  exerciseId,
+  { name, muscleGroupId, description, videoUrl } // --- ADIÇÃO ---
+) => {
   const { rows } = await db.query(
-    "UPDATE custom_exercises SET name = $1, primary_muscle_group_id = $2 WHERE id = $3 RETURNING *",
-    [name, muscleGroupId, exerciseId]
+    // --- MODIFICAÇÃO: Query atualizada para incluir os novos campos ---
+    "UPDATE custom_exercises SET name = $1, primary_muscle_group_id = $2, description = $3, video_url = $4 WHERE id = $5 RETURNING *",
+    [name, muscleGroupId, description, videoUrl, exerciseId]
   );
   return rows[0];
 };

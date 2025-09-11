@@ -250,7 +250,7 @@ gym-assist-frontend/
     Propósito: Este documento detalha o escopo de funcionalidades para a primeira versão do "Gym Assist". O objetivo deste MVP é entregar um produto funcional que materialize a proposta de valor central do projeto: atuar como um "parceiro de treino digital" simples, poderoso e flexível.
 
     Módulos de Funcionalidades
-    Módulo 1: Fundamento e Gestão de Usuário
+    Módulo 1: Fundamento e Gestão de Usuário - OK
     O alicerce do sistema, garantindo que cada usuário tenha uma identidade, segurança e um espaço pessoal dentro da aplicação.
 
     1.1. Cadastro de Usuário: Implementação de uma tela de cadastro que permita a um novo usuário criar sua conta pessoal de forma segura, fornecendo informações essenciais como nome, e-mail e senha.
@@ -433,6 +433,112 @@ gym-assist-frontend/
     Implementar um botão de "Sair" (Logout).
 
     A ação de logout irá simular o fim da sessão e redirecionar o usuário de volta para a página de login (/login).
+
+
+    ---
+
+    Documento de Escopo: Módulo 2 do MVP - Biblioteca de Exercícios
+    Versão: 1.0
+    Data: 10 de Setembro de 2025
+    Propósito: Este documento detalha o escopo de funcionalidades para o Módulo 2 do MVP, a Biblioteca de Exercícios. O objetivo deste módulo é criar o hub central de conteúdo da aplicação, onde o usuário poderá visualizar, filtrar, gerenciar e criar seu repertório pessoal de exercícios.
+
+    Funcionalidades do Módulo
+    2.1. Tela de Gerenciamento de Exercícios (/exercicios)
+    Descrição: A página principal do módulo, que apresenta ao usuário uma lista completa de todos os exercícios aos quais ele tem acesso, exibidos em um layout de grade com cartões (ExerciseCard).
+
+    Sistema de Filtros: A tela possui um sistema de filtragem robusto para que o usuário possa encontrar facilmente o que procura:
+
+    Busca por Nome: Um campo de texto para busca dinâmica e instantânea pelo nome do exercício.
+
+    Filtro por Grupo Muscular: Um dropdown (CustomDropdown) que permite filtrar a lista por um grupo muscular específico.
+
+    Filtro por Tipo (com Evolução Planejada): Um dropdown que atualmente filtra por "Sistema" ou "Customizado". Conforme nosso plano, esta funcionalidade será evoluída para um componente de seleção múltipla (ex: botões de alternância). Isso permitirá ao usuário definir uma visualização padrão (ex: ver sempre 'Sistema' e 'Customizado'), com a preferência salva no navegador (localStorage) para persistir entre as sessões.
+
+    2.2. Gestão de Exercícios Customizados (CRUD)
+    Descrição: A funcionalidade completa para que o usuário possa criar, ler, atualizar e deletar seus próprios exercícios, personalizando a biblioteca para suas necessidades.
+
+    Interface: As operações de Criar e Editar são realizadas através de um modal (ExerciseFormModal) que abre sobre a tela principal, proporcionando uma experiência de usuário fluida e sem a necessidade de recarregar a página.
+
+    Campos do Exercício: Um exercício customizado é definido pelos seguintes campos no formulário do modal:
+
+    Nome (Texto, obrigatório)
+
+    Grupo Muscular Principal (Seleção, obrigatório)
+
+    Descrição/Instruções (Área de texto, opcional)
+
+    URL do Vídeo (Texto, opcional)
+
+    Permissões: As ações de "Editar" e "Excluir" são corretamente exibidas apenas nos cards de exercícios do tipo "Customizado", garantindo que o usuário não possa modificar os exercícios base do sistema.
+
+    2.3. Detalhes do Exercício no Card (ExerciseCard)
+    Descrição: Cada exercício na grade é representado por um ExerciseCard, que exibe as informações essenciais de forma clara e concisa.
+
+    Informações Atuais: O card exibe o nome do exercício e uma etiqueta (TypeTag) que diferencia visualmente entre exercícios do "Sistema" e "Customizado".
+
+    Melhoria Planejada: O card será aprimorado para indicar visualmente a presença de informações adicionais. Por exemplo, exibindo um pequeno ícone de "descrição" (📄) ou "play" (▶️) se o exercício possuir uma descrição ou um vídeo associado, respectivamente.
+
+    2.4. Controle de Visibilidade
+    Descrição: O requisito de controlar a visibilidade dos tipos de exercício (ex: esconder os exercícios "Base") será implementado através da evolução do sistema de filtros descrito no item 2.1. A persistência da escolha do usuário no localStorage funcionará como a configuração de visualização padrão.
+
+    ---
+
+    Documento de Escopo: Módulo 3 do MVP - Criação de Séries
+    Versão: 1.0
+    Data: 11 de Setembro de 2025
+    Propósito: Este documento detalha o escopo de funcionalidades para o Módulo 3, a Criação de Séries. O objetivo deste módulo é fornecer ao usuário as ferramentas para agrupar exercícios da biblioteca em rotinas de treino estruturadas, personalizadas e reutilizáveis.
+
+    Funcionalidades do Módulo
+    3.1. Página de Gerenciamento de Séries (/series)
+    Esta será a nova página central para o usuário visualizar e gerenciar todas as suas séries criadas.
+
+    Layout: A página exibirá as séries do usuário em um layout de cards, mantendo a consistência visual com a página de "Gerenciar Exercícios".
+
+    Conteúdo: Serão listadas apenas as séries ativas (is_active = true).
+
+    Ações na Página: Um botão de destaque "Criar Nova Série" levará o usuário para a página de edição (/series/nova).
+
+    Ações no Card: Cada card de série terá botões para:
+
+    Editar: Navega para a página de edição daquela série (/series/editor/:id).
+
+    Excluir: Permite ao usuário deletar uma série (com uma janela de confirmação).
+
+    Conexão: A página consumirá o endpoint GET /series do backend para buscar os dados.
+
+    3.2. Editor de Séries (/series/editor/:id e /series/nova)
+    A tela principal e mais complexa do módulo, onde o usuário efetivamente monta suas séries.
+
+    Estrutura: Utiliza o componente DualListbox com dois painéis: "Exercícios Disponíveis" à esquerda (com filtros de nome e grupo muscular) e "Exercícios na Série Atual" à direita (com reordenação via drag-and-drop).
+
+    Funcionalidade de Templates: Mantém a funcionalidade existente que permite ao usuário (especialmente professores) carregar um modelo de série para agilizar a criação.
+
+    Conexão com Backend: A página, que hoje é simulada, será conectada à API:
+
+    O botão "Salvar Série" enviará os dados para POST /series (criação) ou PUT /series/:id (edição).
+
+    O carregamento inicial da página no modo de edição buscará os dados de GET /series/:id.
+
+    Validação: O campo "Nome da Série" será validado no frontend para ser de preenchimento obrigatório.
+
+    Redirecionamento: Após salvar com sucesso, o usuário será redirecionado para a nova página /series.
+
+    3.3. Versionamento de Séries
+    A implementação da regra de negócio chave para garantir a integridade do histórico de treinos.
+
+    Regra de Negócio: Séries que já foram executadas em um treino se tornam imutáveis. A "edição" de uma série não a altera diretamente, mas cria um clone (uma nova versão), enquanto a versão anterior é preservada com o status de "inativa".
+
+    Impacto no Backend:
+
+    Schema: A tabela series será modificada para incluir colunas como is_active (BOOLEAN), version (INTEGER) e parent_series_id (INTEGER, auto-referência).
+
+    Lógica: A rota de UPDATE será refeita para executar uma transação que: 1) marca a série antiga como is_active = false, e 2) cria uma nova série (INSERT) com os dados atualizados, vinculada à original.
+
+    Impacto no Frontend:
+
+    Um botão "Versões Anteriores" será adicionado à página do Editor de Séries (no modo de edição).
+
+    Ao ser clicado, este botão abrirá um modal ou uma nova visualização para listar as versões inativas daquela série, permitindo ao usuário apenas visualizá-las.
 
 ---
 

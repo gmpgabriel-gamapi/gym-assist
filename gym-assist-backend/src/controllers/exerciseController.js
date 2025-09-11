@@ -1,15 +1,15 @@
+// [BACKEND] arquivo: src/controllers/exerciseController.js (MODIFICADO)
 const exerciseService = require("../services/exerciseService");
 
 const createCustomExercise = async (req, res) => {
-  const { name, muscleGroupId } = req.body;
+  // --- MODIFICAÇÃO: Extrai os novos campos do body ---
+  const { name, muscleGroupId, description, videoUrl } = req.body;
   const ownerId = req.user.id;
 
   if (!name || !muscleGroupId) {
-    return res
-      .status(400)
-      .json({
-        message: "Nome do exercício e grupo muscular são obrigatórios.",
-      });
+    return res.status(400).json({
+      message: "Nome do exercício e grupo muscular são obrigatórios.",
+    });
   }
 
   try {
@@ -17,6 +17,8 @@ const createCustomExercise = async (req, res) => {
       name,
       ownerId,
       muscleGroupId,
+      description, // Passa o novo campo
+      videoUrl, // Passa o novo campo
     });
     res.status(201).json(newExercise);
   } catch (error) {
@@ -38,7 +40,8 @@ const getAll = async (req, res) => {
 const updateCustom = async (req, res) => {
   const { id } = req.params;
   const userId = req.user.id;
-  const { name, muscleGroupId } = req.body;
+  // --- MODIFICAÇÃO: Extrai os novos campos do body ---
+  const { name, muscleGroupId, description, videoUrl } = req.body;
 
   if (!name || !muscleGroupId) {
     return res
@@ -50,7 +53,8 @@ const updateCustom = async (req, res) => {
     const updatedExercise = await exerciseService.updateCustomExercise(
       id,
       userId,
-      { name, muscleGroupId }
+      // --- MODIFICAÇÃO: Inclui os novos campos no objeto de atualização ---
+      { name, muscleGroupId, description, videoUrl }
     );
     res.status(200).json(updatedExercise);
   } catch (error) {

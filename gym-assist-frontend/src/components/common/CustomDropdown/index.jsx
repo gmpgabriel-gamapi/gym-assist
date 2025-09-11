@@ -1,3 +1,4 @@
+// [FRONTEND] arquivo: src/components/common/CustomDropdown/index.jsx (CORRIGIDO)
 import { useState, useRef, useEffect } from "react";
 import styled, { css } from "styled-components";
 
@@ -7,19 +8,21 @@ const DropdownWrapper = styled.div`
   font-family: ${({ theme }) => theme.fonts.body};
 `;
 
-// O Header agora reage à prop 'disabled'
+// MODIFICAÇÃO: A prop 'hasError' foi renomeada para '$hasError'
 const DropdownHeader = styled.div`
-  padding: 8px 12px;
+  padding: 10px 12px;
   border-radius: 4px;
-  border: 1px solid ${({ theme }) => theme.colors.surface};
-  background-color: ${({ theme }) => theme.colors.surface};
+  border: 1px solid
+    ${({ theme, $hasError }) =>
+      $hasError ? "#E53E3E" : theme.colors.surfaceHover};
+  background-color: ${({ theme }) => theme.colors.background};
   color: ${({ theme }) => theme.colors.text};
   display: flex;
   justify-content: space-between;
   align-items: center;
-  transition: opacity 0.2s;
+  transition: opacity 0.2s, border-color 0.2s;
+  font-size: 1rem;
 
-  /* Estilos aplicados quando o componente está desabilitado */
   cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
   opacity: ${({ disabled }) => (disabled ? 0.5 : 1)};
 `;
@@ -80,7 +83,6 @@ const DropdownItem = styled.li`
   }
 `;
 
-// A função agora aceita e utiliza a prop 'disabled'
 function CustomDropdown({
   options,
   value,
@@ -88,6 +90,7 @@ function CustomDropdown({
   placeholder = "Selecione...",
   filterType = "startsWithWord",
   disabled = false,
+  hasError = false, // O nome da prop recebida não muda
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -107,7 +110,7 @@ function CustomDropdown({
   }, []);
 
   const handleToggle = () => {
-    if (disabled) return; // Impede qualquer ação se estiver desabilitado
+    if (disabled) return;
     if (isOpen) {
       setSearchTerm("");
     }
@@ -125,14 +128,11 @@ function CustomDropdown({
   const filteredOptions = options.filter((option) => {
     if (option.$isSpecial) return true;
     if (!searchTerm) return true;
-
     const searchTermLower = searchTerm.toLowerCase();
     const labelLower = option.label.toLowerCase();
-
     if (filterType === "contains") {
       return labelLower.includes(searchTermLower);
     }
-
     const startsWithTerm = labelLower.startsWith(searchTermLower);
     const wordStartsWithTerm = labelLower
       .split(" ")
@@ -142,12 +142,16 @@ function CustomDropdown({
 
   return (
     <DropdownWrapper ref={dropdownRef}>
-      <DropdownHeader onClick={handleToggle} disabled={disabled}>
+      {/* MODIFICAÇÃO: Passa a prop com '$' para o styled-component */}
+      <DropdownHeader
+        onClick={handleToggle}
+        disabled={disabled}
+        $hasError={hasError}
+      >
         {selectedOption ? selectedOption.label : placeholder}
         <span>{isOpen && !disabled ? "▲" : "▼"}</span>
       </DropdownHeader>
 
-      {/* A lista só abre se não estiver desabilitado */}
       {isOpen && !disabled && (
         <DropdownList>
           <SearchInput
