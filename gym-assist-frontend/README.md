@@ -540,6 +540,43 @@ gym-assist-frontend/
 
     Ao ser clicado, este botão abrirá um modal ou uma nova visualização para listar as versões inativas daquela série, permitindo ao usuário apenas visualizá-las.
 
+    ---
+
+    Documento de Escopo: Módulo 4 do MVP - Montagem de Treino (Versão 3)
+    Versão: 3.0
+    Propósito: Detalhar o escopo do Módulo 4, que permite ao usuário montar seu Plano de Treino ativo e introduz um sistema de versionamento em cascata para garantir a integridade total do histórico.
+
+    Funcionalidades do Módulo
+    4.1. Ponto de Acesso na Central de Planejamento
+
+    Um novo card, "Montar Plano de Treino", será adicionado à página /planejamento, levando à rota do editor do plano ativo.
+
+    4.2. Editor do Plano de Treino Ativo
+
+    Modo de Sequenciamento: A página terá um seletor para o usuário escolher entre os modos "Loop" e "Dias da Semana".
+
+    Interface Dinâmica: A tela usará um layout de DualListbox.
+
+    Modo Loop: Exibirá uma lista única e reordenável para definir a sequência.
+
+    Modo Dias da Semana: Exibirá sete áreas (uma para cada dia), onde o usuário poderá arrastar e soltar as séries.
+
+    Lógica de Salvamento: O botão "Salvar Plano" persistirá a configuração, acionando a lógica de versionamento.
+
+    4.3. Versionamento em Cascata (Regra de Negócio Central)
+
+    Princípio: O sistema implementará a "Regra de Ouro": uma entidade executada (Plano, Série, Exercício Customizado) é imutável.
+
+    Gatilhos de Versionamento:
+
+    Uma edição direta em um Plano de Treino que já foi executado criará uma nova versão do Plano.
+
+    Uma edição direta em uma Série que já foi executada criará uma nova versão da Série e, em cascata, também criará uma nova versão do Plano de Treino que a continha (se o plano também já tiver sido executado).
+
+    Uma edição em um Exercício Customizado que já foi executado criará uma nova versão do Exercício e, em cascata, também criará novas versões de todas as Séries e Planos de Treino executados que o continham.
+
+    Impacto no Banco de Dados: As tabelas training_plans e custom_exercises também receberão as colunas de versionamento (is_active, version, parent_..._id), assim como a tabela series.
+
 ---
 
 ## Anexo D: Informações do Template (React + Vite)

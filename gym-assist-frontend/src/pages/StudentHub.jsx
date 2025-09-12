@@ -10,7 +10,7 @@ import {
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useAuth } from "../context/AuthContext";
-import { getSeriesForUser } from "../services/seriesService";
+import { getAllSeries } from "../services/seriesService";
 import {
   getActivePlan,
   updatePlanSeries,
@@ -162,7 +162,7 @@ function StudentHub() {
         setError(null);
         const [planData, libraryData, studentData] = await Promise.all([
           getActivePlan(studentId),
-          getSeriesForUser(),
+          getAllSeries(),
           getProfile(studentId),
         ]);
 

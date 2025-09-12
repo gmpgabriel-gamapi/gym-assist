@@ -1,7 +1,7 @@
-// [FRONTEND] arquivo: src/AppRoutes.jsx (MODIFICADO)
+// [FRONTEND] arquivo: src/AppRoutes.jsx (VERSÃO COMPLETA)
 import { Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
-import Register from "./pages/Register"; // 1. IMPORTAÇÃO DO NOVO COMPONENTE
+import Register from "./pages/Register";
 import Layout from "./components/layout/Layout";
 import MyTraining from "./pages/MyTraining";
 import SeriesEditor from "./pages/SeriesEditor";
@@ -12,6 +12,8 @@ import Students from "./pages/Students";
 import Planejamento from "./pages/Planejamento";
 import StudentHub from "./pages/StudentHub";
 import ProtectedRoute from "./router/ProtectedRoute";
+import SeriesList from "./pages/SeriesList";
+import ArchivedSeriesList from "./pages/ArchivedSeriesList";
 
 function AppRoutes() {
   const DashboardContent = () => (
@@ -23,11 +25,9 @@ function AppRoutes() {
 
   return (
     <Routes>
-      {/* Rotas Públicas */}
       <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />{" "}
-      {/* 2. ADIÇÃO DA NOVA ROTA */}
-      {/* Rotas Protegidas */}
+      <Route path="/cadastro" element={<Register />} />
+
       <Route element={<ProtectedRoute />}>
         <Route
           path="/"
@@ -82,6 +82,22 @@ function AppRoutes() {
           element={
             <Layout>
               <StudentHub />
+            </Layout>
+          }
+        />
+        <Route
+          path="/series"
+          element={
+            <Layout>
+              <SeriesList />
+            </Layout>
+          }
+        />
+        <Route
+          path="/series/arquivadas"
+          element={
+            <Layout>
+              <ArchivedSeriesList />
             </Layout>
           }
         />

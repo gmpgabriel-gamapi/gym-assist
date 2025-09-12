@@ -1,4 +1,4 @@
-// [FRONTEND] arquivo: src/components/exercises/TypeFilterToggle.jsx (CORRIGIDO)
+// [FRONTEND] arquivo: src/components/exercises/TypeFilterToggle.jsx (MODIFICADO)
 import React from "react";
 import styled from "styled-components";
 
@@ -9,7 +9,6 @@ const Wrapper = styled.div`
   flex-wrap: wrap;
 `;
 
-// MODIFICAÇÃO: A prop 'isSelected' foi renomeada para '$isSelected'
 const FilterButton = styled.button`
   padding: 8px 16px;
   border-radius: 20px;
@@ -38,7 +37,8 @@ const FilterLabel = styled.span`
   margin-right: ${({ theme }) => theme.spacing.small};
 `;
 
-function TypeFilterToggle({ options, selectedTypes, onChange }) {
+// A função agora aceita a prop 'label'
+function TypeFilterToggle({ label, options, selectedTypes, onChange }) {
   const handleToggle = (typeValue) => {
     const newSelection = new Set(selectedTypes);
 
@@ -53,11 +53,12 @@ function TypeFilterToggle({ options, selectedTypes, onChange }) {
 
   return (
     <Wrapper>
-      <FilterLabel>Exercícios visíveis:</FilterLabel>
+      {/* O label agora é dinâmico */}
+      <FilterLabel>{label}</FilterLabel>
       {options.map((option) => (
         <FilterButton
           key={option.value}
-          $isSelected={selectedTypes.includes(option.value)} // MODIFICAÇÃO: Prop renomeada
+          $isSelected={selectedTypes.includes(option.value)}
           onClick={() => handleToggle(option.value)}
         >
           {option.label}

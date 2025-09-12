@@ -50,7 +50,7 @@ function Planejamento() {
           <p>Visualize, crie, edite e delete exercícios da sua biblioteca.</p>
         </PlanningCard>
 
-        <PlanningCard to="/series/nova">
+        <PlanningCard to="/series">
           <h3>Gerenciar Séries</h3>
           <p>Crie e edite suas séries de treino para montar seus planos.</p>
         </PlanningCard>

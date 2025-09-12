@@ -352,6 +352,7 @@ function Exercises() {
           options={typeOptions}
           selectedTypes={selectedTypes}
           onChange={setSelectedTypes}
+          label="Exercícios visíveis:"
         />
         <FilterRow>
           <SearchInput

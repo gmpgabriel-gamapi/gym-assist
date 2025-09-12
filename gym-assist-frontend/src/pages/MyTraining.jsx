@@ -2,7 +2,7 @@ import { useMemo, useEffect, useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { getSeriesForUser } from "../services/seriesService";
+import { getAllSeries } from "../services/seriesService";
 import SeriesCard from "../components/training/SeriesCard";
 
 const PageWrapper = styled.div`
@@ -55,7 +55,7 @@ function MyTraining() {
     const fetchSeries = async () => {
       try {
         setLoading(true);
-        const seriesData = await getSeriesForUser(profileToView.id);
+        const seriesData = await getAllSeries(profileToView.id);
         setActivePlan({
           series: seriesData,
           sequencingMode: "loop",

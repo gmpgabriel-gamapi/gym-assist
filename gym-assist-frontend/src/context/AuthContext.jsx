@@ -1,4 +1,4 @@
-// [FRONTEND] arquivo: gym-assist-frontend/src/context/AuthContext.jsx (VERSÃO COMPLETA E CORRIGIDA)
+// [FRONTEND] arquivo: src/context/AuthContext.jsx (VERSÃO LIMPA)
 import {
   createContext,
   useState,
@@ -11,7 +11,6 @@ import {
   register as apiRegister,
 } from "../services/authService";
 import { getProfile } from "../services/profileService";
-import { teacherUserMock } from "../mocks/userMocks";
 
 const AuthContext = createContext();
 
@@ -26,38 +25,34 @@ export function AuthProvider({ children }) {
     setUser(null);
   }, []);
 
-  const fetchAndSetUser = useCallback(async () => {
-    const token = localStorage.getItem("authToken");
-    if (token) {
-      try {
-        const profileData = await getProfile();
-        setUser(profileData);
-      } catch (error) {
-        console.error("Sessão inválida:", error);
-        logout();
+  useEffect(() => {
+    const bootstrapAuth = async () => {
+      const token = localStorage.getItem("authToken");
+      if (token) {
+        try {
+          const profileData = await getProfile();
+          setUser(profileData);
+          localStorage.setItem("user", JSON.stringify(profileData));
+        } catch (error) {
+          console.error(
+            "Token inválido ou sessão expirou, fazendo logout.",
+            error
+          );
+          logout();
+        }
       }
-    }
-    setLoading(false);
+      setLoading(false);
+    };
+
+    bootstrapAuth();
   }, [logout]);
 
-  useEffect(() => {
-    fetchAndSetUser();
-  }, [fetchAndSetUser]);
-
-  // LÓGICA DE LOGIN ORIGINAL RESTAURADA
   const login = async (email, password) => {
     try {
       const data = await apiLogin(email, password);
       localStorage.setItem("authToken", data.token);
-
-      const isTeacherTestMode = true;
-      if (isTeacherTestMode) {
-        setUser(teacherUserMock);
-        localStorage.setItem("user", JSON.stringify(teacherUserMock));
-      } else {
-        setUser(data.user);
-        localStorage.setItem("user", JSON.stringify(data.user));
-      }
+      setUser(data.user);
+      localStorage.setItem("user", JSON.stringify(data.user));
       return data;
     } catch (error) {
       logout();
@@ -65,7 +60,6 @@ export function AuthProvider({ children }) {
     }
   };
 
-  // NOVA LÓGICA DE REGISTRO
   const register = async (name, email, password) => {
     try {
       const data = await apiRegister(name, email, password);
@@ -76,7 +70,16 @@ export function AuthProvider({ children }) {
   };
 
   const refetchUser = async () => {
-    await fetchAndSetUser();
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      try {
+        const profileData = await getProfile();
+        setUser(profileData);
+        localStorage.setItem("user", JSON.stringify(profileData));
+      } catch (error) {
+        logout();
+      }
+    }
   };
 
   const value = {

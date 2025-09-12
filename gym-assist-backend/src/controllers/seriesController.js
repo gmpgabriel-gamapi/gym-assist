@@ -1,3 +1,4 @@
+// [BACKEND] arquivo: src/controllers/seriesController.js (MODIFICADO)
 const seriesService = require("../services/seriesService");
 
 const create = async (req, res) => {
@@ -37,8 +38,64 @@ const getById = async (req, res) => {
   }
 };
 
+const update = async (req, res) => {
+  try {
+    const updatedSeries = await seriesService.updateSeriesForUser(
+      req.params.id,
+      req.user.id,
+      req.body
+    );
+    res.status(200).json(updatedSeries);
+  } catch (error) {
+    console.error("Erro ao atualizar série:", error);
+    res
+      .status(error.status || 500)
+      .json({ message: error.message || "Erro interno do servidor" });
+  }
+};
+
+const deleteSeriesController = async (req, res) => {
+  try {
+    await seriesService.deleteSeriesForUser(req.params.id, req.user.id);
+    res.status(204).send();
+  } catch (error) {
+    console.error("Erro ao deletar série:", error);
+    res
+      .status(error.status || 500)
+      .json({ message: error.message || "Erro interno do servidor" });
+  }
+};
+
+const getVersions = async (req, res) => {
+  try {
+    const versions = await seriesService.getSeriesVersionsForUser(
+      req.params.id,
+      req.user.id
+    );
+    res.status(200).json(versions);
+  } catch (error) {
+    res
+      .status(error.status || 500)
+      .json({ message: error.message || "Erro interno do servidor" });
+  }
+};
+
+const getArchived = async (req, res) => {
+  try {
+    const series = await seriesService.getArchivedSeriesForUser(req.user.id);
+    res.status(200).json(series);
+  } catch (error) {
+    console.error("Erro ao buscar séries arquivadas:", error);
+    res.status(500).json({ message: "Erro interno do servidor" });
+  }
+};
+
 module.exports = {
   create,
   getAll,
   getById,
+  update,
+  delete: deleteSeriesController,
+  getVersions,
+  getArchived, // Nova exportação
 };

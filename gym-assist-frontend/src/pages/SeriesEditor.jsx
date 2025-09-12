@@ -1,31 +1,49 @@
+// [FRONTEND] arquivo: src/pages/SeriesEditor.jsx (MODIFICADO)
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { DndContext, closestCenter } from "@dnd-kit/core";
-import {
-  SortableContext,
-  arrayMove,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-
 import { useAuth } from "../context/AuthContext";
 import { getMuscleGroups } from "../services/muscleGroupService";
 import { getAllExercises } from "../services/exerciseService";
-import { activeTrainingMock } from "../mocks/trainingMocks";
+import {
+  getSeriesById,
+  createSeries,
+  updateSeries,
+  getSeriesVersions,
+} from "../services/seriesService";
 import DualListbox from "../components/common/DualListbox";
 import SeriesExerciseItem from "../components/training/SeriesExerciseItem";
 import CustomDropdown from "../components/common/CustomDropdown";
+import VersionHistoryModal from "../components/training/VersionHistoryModal";
 
 const PageHeader = styled.header`
   margin-bottom: ${({ theme }) => theme.spacing.large};
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: ${({ theme }) => theme.spacing.medium};
+`;
+
+const PageTitleWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.medium};
+  flex-wrap: wrap;
 `;
 
 const PageTitle = styled.h2`
   color: ${({ theme }) => theme.colors.primary};
   margin: 0;
+`;
+
+const VersionBadge = styled.span`
+  background-color: ${({ theme }) => theme.colors.surface};
+  color: ${({ theme }) => theme.colors.textSecondary};
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: bold;
 `;
 
 const ButtonGroup = styled.div`
@@ -138,37 +156,49 @@ function SeriesEditor() {
   const navigate = useNavigate();
 
   const [seriesName, setSeriesName] = useState("");
+  const [currentSeries, setCurrentSeries] = useState(null);
   const [seriesExercises, setSeriesExercises] = useState([]);
-
   const [exerciseLibrary, setExerciseLibrary] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [muscleGroupFilter, setMuscleGroupFilter] = useState("all");
   const [muscleGroups, setMuscleGroups] = useState([]);
-
   const [templateSource, setTemplateSource] = useState("none");
   const [templateOptions, setTemplateOptions] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [versionHistory, setVersionHistory] = useState([]);
 
   useEffect(() => {
     const loadInitialData = async () => {
       try {
         setLoading(true);
+        setError(null);
         const [exercisesData, muscleGroupsData] = await Promise.all([
           getAllExercises(),
           getMuscleGroups(),
         ]);
-
         exercisesData.sort((a, b) => a.name.localeCompare(b.name));
         setExerciseLibrary(exercisesData);
-
         const groupOptions = [
           { value: "all", label: "Todos os Grupos" },
           ...muscleGroupsData.map((g) => ({ value: g.id, label: g.name })),
         ];
         setMuscleGroups(groupOptions);
+        if (isEditMode && seriesId) {
+          const seriesToEdit = await getSeriesById(seriesId);
+          if (seriesToEdit) {
+            setSeriesName(seriesToEdit.name);
+            setCurrentSeries(seriesToEdit);
+            const exercisesWithConfig = seriesToEdit.exercises.map((ex) => ({
+              ...ex,
+              sets: ex.sets || "",
+              reps: ex.reps || "",
+            }));
+            setSeriesExercises(exercisesWithConfig);
+          }
+        }
       } catch (err) {
         setError("Falha ao carregar dados da página.");
         console.error(err);
@@ -177,51 +207,12 @@ function SeriesEditor() {
       }
     };
     loadInitialData();
-  }, []);
-
-  useEffect(() => {
-    if (isEditMode) {
-      const seriesToEdit = activeTrainingMock.series.find(
-        (s) => s.id === seriesId
-      );
-      if (seriesToEdit) {
-        setSeriesName(seriesToEdit.name);
-        const exercisesWithConfig = seriesToEdit.exercises.map((ex) => ({
-          ...ex,
-          sets: ex.sets || "",
-          reps: ex.reps || "",
-        }));
-        setSeriesExercises(exercisesWithConfig);
-      }
-    }
   }, [seriesId, isEditMode]);
 
   useEffect(() => {
     let options = [];
     if (templateSource === "student") {
-      options = (activeTrainingMock.series || []).map((s) => ({
-        value: s.id,
-        label: s.name,
-        fullData: s,
-      }));
     } else if (templateSource === "personal") {
-      options = (user.personalSeries || []).map((s) => ({
-        value: s.id,
-        label: s.name,
-        fullData: s,
-      }));
-    } else if (templateSource === "templates") {
-      options = (user.seriesTemplates || []).map((t) => ({
-        value: t.id,
-        label: t.name,
-        fullData: t,
-      }));
-    } else if (templateSource === "own_series") {
-      options = (activeTrainingMock.series || []).map((s) => ({
-        value: s.id,
-        label: s.name,
-        fullData: s,
-      }));
     }
     setTemplateOptions(options);
     setSelectedTemplate(null);
@@ -249,9 +240,7 @@ function SeriesEditor() {
   const availableExercises = exerciseLibrary
     .filter((ex) => {
       if (selectedTemplate) {
-        return selectedTemplate.fullData.exercises.some(
-          (templateEx) => templateEx.id === ex.id
-        );
+        return false;
       }
       return true;
     })
@@ -293,32 +282,57 @@ function SeriesEditor() {
   const handleDragEnd = (event) => {
     const { active, over } = event;
     if (active && over && active.id !== over.id) {
-      setSeriesExercises((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id);
-        const newIndex = items.findIndex((item) => item.id === over.id);
-        return arrayMove(items, oldIndex, newIndex);
-      });
+      const oldIndex = seriesExercises.findIndex(
+        (item) => item.id === active.id
+      );
+      const newIndex = seriesExercises.findIndex((item) => item.id === over.id);
+      setSeriesExercises((items) => arrayMove(items, oldIndex, newIndex));
     }
   };
 
-  const handleSaveSeries = () => {
-    const finalSeries = {
-      id: seriesId || `new_${Date.now()}`,
-      ownerId: currentProfile.id,
-      ownerName: currentProfile.name,
+  const handleSaveSeries = async () => {
+    if (!seriesName.trim()) {
+      alert("O nome da série é obrigatório.");
+      return;
+    }
+    const seriesData = {
       name: seriesName,
-      exercises: seriesExercises,
+      exercises: seriesExercises.map((ex, index) => ({
+        id: ex.id,
+        type: ex.type,
+        sets: ex.sets || null,
+        reps: ex.reps || null,
+        order: index,
+      })),
     };
-    console.log("Série Salva (simulado):", finalSeries);
-    alert(
-      `Série para ${currentProfile.name} salva com sucesso! Verifique o console.`
-    );
-    navigate("/meu-treino");
+    try {
+      if (isEditMode) {
+        await updateSeries(seriesId, seriesData);
+      } else {
+        await createSeries(seriesData);
+      }
+      alert("Série salva com sucesso!");
+      navigate("/series");
+    } catch (err) {
+      console.error("Falha ao salvar a série:", err);
+      alert(err.message || "Não foi possível salvar a série.");
+    }
+  };
+
+  const handleOpenHistory = async () => {
+    if (!seriesId) return;
+    try {
+      const versions = await getSeriesVersions(seriesId);
+      setVersionHistory(versions);
+      setIsHistoryOpen(true);
+    } catch (err) {
+      alert(err.message || "Não foi possível carregar o histórico.");
+    }
   };
 
   const title = isEditMode
-    ? `Editando Série: ${seriesName}`
-    : `Criar Nova Série para ${currentProfile.name}`;
+    ? `Editando Série`
+    : `Criar Nova Série para ${currentProfile?.name}`;
 
   if (loading) {
     return <div>Carregando editor de séries...</div>;
@@ -336,9 +350,22 @@ function SeriesEditor() {
       }}
     >
       <PageHeader>
-        <PageTitle>{title}</PageTitle>
+        <PageTitleWrapper>
+          <PageTitle>{title}</PageTitle>
+          {isEditMode && currentSeries && (
+            <VersionBadge>Versão: {currentSeries.version}</VersionBadge>
+          )}
+        </PageTitleWrapper>
         <ButtonGroup>
-          <BackButton onClick={() => navigate(-1)}>Voltar</BackButton>
+          {isEditMode &&
+            currentSeries &&
+            (currentSeries.version > 1 || currentSeries.parent_series_id) && (
+              <BackButton onClick={handleOpenHistory}>
+                Versões Anteriores
+              </BackButton>
+            )}
+          {/* --- MODIFICAÇÃO: O botão Voltar agora sempre leva para /series --- */}
+          <BackButton onClick={() => navigate("/series")}>Voltar</BackButton>
           <SaveButton onClick={handleSaveSeries}>Salvar Série</SaveButton>
         </ButtonGroup>
       </PageHeader>
@@ -412,6 +439,12 @@ function SeriesEditor() {
           />
         </FiltersWrapper>
       </DualListbox>
+
+      <VersionHistoryModal
+        isOpen={isHistoryOpen}
+        onClose={() => setIsHistoryOpen(false)}
+        versions={versionHistory}
+      />
     </div>
   );
 }
