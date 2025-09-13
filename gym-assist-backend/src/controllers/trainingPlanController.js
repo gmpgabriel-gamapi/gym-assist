@@ -1,3 +1,4 @@
+// [BACKEND] arquivo: src/controllers/trainingPlanController.js (CORRIGIDO)
 const trainingPlanService = require("../services/trainingPlanService");
 
 const getActivePlan = async (req, res) => {
@@ -19,21 +20,14 @@ const getActivePlan = async (req, res) => {
 const updatePlanSeries = async (req, res) => {
   try {
     const { planId } = req.params;
-    const { seriesIds } = req.body; // Espera um array de IDs de séries
+    const planConfig = req.body; // Agora recebe o objeto { mode, data }
     const requesterId = req.user.id;
 
-    if (!Array.isArray(seriesIds)) {
-      return res
-        .status(400)
-        .json({
-          message: "O corpo da requisição deve conter um array de seriesIds.",
-        });
-    }
-
+    // A validação agora é mais inteligente e fica no service
     const result = await trainingPlanService.updateActivePlanSeries(
       planId,
       requesterId,
-      seriesIds
+      planConfig
     );
     res.status(200).json(result);
   } catch (error) {

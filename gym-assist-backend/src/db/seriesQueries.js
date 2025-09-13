@@ -1,4 +1,4 @@
-// [BACKEND] arquivo: src/db/seriesQueries.js (VERSÃO 100% COMPLETA)
+// [BACKEND] arquivo: src/db/seriesQueries.js (QUERY CORRIGIDA)
 const db = require("./index");
 
 const createSeries = async (ownerId, name, exercises) => {
@@ -42,14 +42,32 @@ const findSeriesByOwner = async (ownerId) => {
   const query = `
         SELECT 
             s.id, s.name, s.notes, s.created_at, s.owner_id, s.is_active, s.version, s.parent_series_id,
-            COALESCE(json_agg(json_build_object('id', COALESCE(be.id, ce.id), 'name', COALESCE(be.name, ce.name), 'type', CASE WHEN be.id IS NOT NULL THEN 'base' ELSE 'custom' END, 'sets', se.sets, 'reps', se.reps, 'order', se.exercise_order) ORDER BY se.exercise_order) FILTER (WHERE se.id IS NOT NULL), '[]'::json) as exercises
-        FROM series s
-        LEFT JOIN series_exercises se ON s.id = se.series_id
-        LEFT JOIN base_exercises be ON se.base_exercise_id = be.id
-        LEFT JOIN custom_exercises ce ON se.custom_exercise_id = ce.id
-        WHERE s.owner_id = $1 AND s.is_active = true
-        GROUP BY s.id
-        ORDER BY s.created_at DESC;
+            COALESCE(
+                json_agg(
+                    json_build_object(
+                        'id', COALESCE(be.id, ce.id),
+                        'name', COALESCE(be.name, ce.name),
+                        'type', CASE WHEN be.id IS NOT NULL THEN 'base' ELSE 'custom' END,
+                        'sets', se.sets,
+                        'reps', se.reps,
+                        'order', se.exercise_order
+                    ) ORDER BY se.exercise_order
+                ) FILTER (WHERE se.id IS NOT NULL OR be.id IS NOT NULL OR ce.id IS NOT NULL), '[]'::json
+            ) as exercises
+        FROM 
+            series s
+        LEFT JOIN 
+            series_exercises se ON s.id = se.series_id
+        LEFT JOIN
+            base_exercises be ON se.base_exercise_id = be.id
+        LEFT JOIN
+            custom_exercises ce ON se.custom_exercise_id = ce.id
+        WHERE 
+            s.owner_id = $1 AND s.is_active = true
+        GROUP BY 
+            s.id
+        ORDER BY 
+            s.created_at DESC;
     `;
   const { rows } = await db.query(query, [ownerId]);
   return rows;
@@ -59,15 +77,40 @@ const findSeriesById = async (seriesId, ownerId) => {
   const query = `
     SELECT 
         s.id, s.name, s.notes, s.created_at, s.owner_id, s.is_active, s.version, s.parent_series_id,
-        COALESCE(json_agg(json_build_object('id', COALESCE(be.id, ce.id), 'name', COALESCE(be.name, ce.name), 'type', CASE WHEN be.id IS NOT NULL THEN 'base' ELSE 'custom' END, 'sets', se.sets, 'reps', se.reps, 'order', se.exercise_order, 'lastLoad', '0kg') ORDER BY se.exercise_order) FILTER (WHERE se.id IS NOT NULL), '[]'::json) as exercises
-    FROM series s
-    LEFT JOIN series_exercises se ON s.id = se.series_id
-    LEFT JOIN base_exercises be ON se.base_exercise_id = be.id
-    LEFT JOIN custom_exercises ce ON se.custom_exercise_id = ce.id
-    WHERE s.id = $1 AND s.owner_id = $2
-    GROUP BY s.id;
+        COALESCE(
+            json_agg(
+                json_build_object(
+                    'id', COALESCE(be.id, ce.id),
+                    'name', COALESCE(be.name, ce.name),
+                    'type', CASE WHEN be.id IS NOT NULL THEN 'base' ELSE 'custom' END,
+                    'sets', se.sets,
+                    'reps', se.reps,
+                    'order', se.exercise_order,
+                    'lastLoad', '0kg'
+                ) ORDER BY se.exercise_order
+            ) FILTER (WHERE se.id IS NOT NULL OR be.id IS NOT NULL OR ce.id IS NOT NULL), '[]'::json
+        ) as exercises
+    FROM 
+        series s
+    LEFT JOIN 
+        series_exercises se ON s.id = se.series_id
+    LEFT JOIN
+        base_exercises be ON se.base_exercise_id = be.id
+    LEFT JOIN
+        custom_exercises ce ON se.custom_exercise_id = ce.id
+    WHERE 
+        (s.id = $1 AND s.owner_id = $2) OR (s.id = $1 AND $2 IS NULL)
+    GROUP BY 
+        s.id;
   `;
   const { rows } = await db.query(query, [seriesId, ownerId]);
+
+  // Vamos manter o log por enquanto para a validação final
+  console.log(
+    `[DEBUG] Resultado da Query CORRIGIDA findSeriesById para seriesId=${seriesId}:`,
+    JSON.stringify(rows[0], null, 2)
+  );
+
   return rows[0];
 };
 
@@ -174,31 +217,14 @@ const findInactiveVersions = async (parentId, ownerId) => {
   const query = `
         SELECT 
             s.id, s.name, s.version, s.created_at,
-            COALESCE(
-                json_agg(
-                    json_build_object(
-                        'name', COALESCE(be.name, ce.name),
-                        'sets', se.sets,
-                        'reps', se.reps
-                    ) ORDER BY se.exercise_order
-                ) FILTER (WHERE se.id IS NOT NULL), '[]'::json
-            ) as exercises
-        FROM 
-            series s
-        LEFT JOIN 
-            series_exercises se ON s.id = se.series_id
-        LEFT JOIN
-            base_exercises be ON se.base_exercise_id = be.id
-        LEFT JOIN
-            custom_exercises ce ON se.custom_exercise_id = ce.id
-        WHERE 
-            (s.parent_series_id = $1 OR s.id = $1)
-            AND s.owner_id = $2
-            AND s.is_active = false
-        GROUP BY 
-            s.id
-        ORDER BY 
-            s.version ASC;
+            COALESCE(json_agg(json_build_object('name', COALESCE(be.name, ce.name), 'sets', se.sets, 'reps', se.reps) ORDER BY se.exercise_order) FILTER (WHERE se.id IS NOT NULL), '[]'::json) as exercises
+        FROM series s
+        LEFT JOIN series_exercises se ON s.id = se.series_id
+        LEFT JOIN base_exercises be ON se.base_exercise_id = be.id
+        LEFT JOIN custom_exercises ce ON se.custom_exercise_id = ce.id
+        WHERE (s.parent_series_id = $1 OR s.id = $1) AND s.owner_id = $2 AND s.is_active = false
+        GROUP BY s.id
+        ORDER BY s.version ASC;
     `;
   const { rows } = await db.query(query, [parentId, ownerId]);
   return rows;
@@ -212,37 +238,35 @@ const findArchivedSeriesHeads = async (ownerId) => {
             WHERE owner_id = $1 AND is_active = true
         ),
         ranked_inactive AS (
-            SELECT
-                s.id, s.name, s.notes, s.created_at, s.owner_id, s.version, s.parent_series_id,
-                ROW_NUMBER() OVER(PARTITION BY COALESCE(s.parent_series_id, s.id) ORDER BY s.version DESC) as rn
+            SELECT s.*, ROW_NUMBER() OVER(PARTITION BY COALESCE(s.parent_series_id, s.id) ORDER BY s.version DESC) as rn
             FROM series s
             WHERE s.owner_id = $1 AND s.is_active = false
         )
-        SELECT 
-            ri.id, ri.name, ri.notes, ri.created_at, ri.owner_id, ri.version,
-            COALESCE(
-                json_agg(
-                    json_build_object(
-                        'id', COALESCE(be.id, ce.id),
-                        'name', COALESCE(be.name, ce.name),
-                        'type', CASE WHEN be.id IS NOT NULL THEN 'base' ELSE 'custom' END,
-                        'sets', se.sets,
-                        'reps', se.reps,
-                        'order', se.exercise_order
-                    ) ORDER BY se.exercise_order
-                ) FILTER (WHERE se.id IS NOT NULL), '[]'::json
-            ) as exercises
+        SELECT ri.id, ri.name, ri.notes, ri.created_at, ri.owner_id, ri.version,
+            COALESCE(json_agg(json_build_object('id', COALESCE(be.id, ce.id), 'name', COALESCE(be.name, ce.name), 'type', CASE WHEN be.id IS NOT NULL THEN 'base' ELSE 'custom' END, 'sets', se.sets, 'reps', se.reps, 'order', se.exercise_order) ORDER BY se.exercise_order) FILTER (WHERE se.id IS NOT NULL), '[]'::json) as exercises
         FROM ranked_inactive ri
         LEFT JOIN series_exercises se ON ri.id = se.series_id
         LEFT JOIN base_exercises be ON se.base_exercise_id = be.id
         LEFT JOIN custom_exercises ce ON se.custom_exercise_id = ce.id
-        WHERE 
-            ri.rn = 1 
-            AND COALESCE(ri.parent_series_id, ri.id) NOT IN (SELECT family_id FROM active_families)
-        GROUP BY 
-            ri.id, ri.name, ri.notes, ri.created_at, ri.owner_id, ri.version;
+        WHERE ri.rn = 1 AND COALESCE(ri.parent_series_id, ri.id) NOT IN (SELECT family_id FROM active_families)
+        GROUP BY ri.id, ri.name, ri.notes, ri.created_at, ri.owner_id, ri.version;
     `;
   const { rows } = await db.query(query, [ownerId]);
+  return rows;
+};
+
+const findSeriesContainingExercise = async (exerciseId) => {
+  const query = `
+        SELECT s.*,
+            COALESCE(json_agg(json_build_object('id', COALESCE(be.id, ce.id), 'name', COALESCE(be.name, ce.name), 'type', CASE WHEN be.id IS NOT NULL THEN 'base' ELSE 'custom' END, 'sets', se.sets, 'reps', se.reps, 'order', se.exercise_order) ORDER BY se.exercise_order) FILTER (WHERE se.id IS NOT NULL), '[]'::json) as exercises
+        FROM series s
+        JOIN series_exercises se ON s.id = se.series_id
+        LEFT JOIN base_exercises be ON se.base_exercise_id = be.id
+        LEFT JOIN custom_exercises ce ON se.custom_exercise_id = ce.id
+        WHERE s.is_active = true AND se.custom_exercise_id = $1
+        GROUP BY s.id;
+    `;
+  const { rows } = await db.query(query, [exerciseId]);
   return rows;
 };
 
@@ -257,4 +281,5 @@ module.exports = {
   hardDeleteSingleSeries,
   findInactiveVersions,
   findArchivedSeriesHeads,
+  findSeriesContainingExercise,
 };

@@ -1,5 +1,6 @@
-// [BACKEND] arquivo: src/services/seriesService.js (MODIFICADO)
+// [BACKEND] arquivo: src/services/seriesService.js (VERSÃO 100% COMPLETA)
 const seriesQueries = require("../db/seriesQueries");
+const trainingPlanService = require("./trainingPlanService");
 
 const createSeriesForUser = async (userId, seriesData) => {
   const { name, exercises } = seriesData;
@@ -41,12 +42,29 @@ const updateSeriesForUser = async (seriesId, userId, seriesData) => {
   if (!existingSeries) {
     throw { status: 404, message: "Série não encontrada ou acesso negado." };
   }
+
   const hasBeenExecuted = await seriesQueries.hasExecutions(seriesId);
+  let newSeriesVersion;
+
   if (hasBeenExecuted) {
-    return seriesQueries.createNewVersion(existingSeries, name, exercises);
+    newSeriesVersion = await seriesQueries.createNewVersion(
+      existingSeries,
+      name,
+      exercises
+    );
+    // Aciona a cascata para o plano de treino
+    await trainingPlanService.propagateSeriesUpdate(
+      existingSeries.id,
+      newSeriesVersion
+    );
   } else {
-    return seriesQueries.updateSeriesInPlace(seriesId, name, exercises);
+    newSeriesVersion = await seriesQueries.updateSeriesInPlace(
+      seriesId,
+      name,
+      exercises
+    );
   }
+  return newSeriesVersion;
 };
 
 const deleteSeriesForUser = async (seriesId, userId) => {
@@ -75,6 +93,39 @@ const getArchivedSeriesForUser = async (userId) => {
   return seriesQueries.findArchivedSeriesHeads(userId);
 };
 
+const propagateExerciseUpdate = async (oldExerciseId, newExercise) => {
+  const affectedSeriesList = await seriesQueries.findSeriesContainingExercise(
+    oldExerciseId
+  );
+  for (const series of affectedSeriesList) {
+    const updatedExercises = series.exercises.map((ex) =>
+      ex.id === oldExerciseId
+        ? {
+            ...newExercise,
+            type: "custom",
+            sets: ex.sets,
+            reps: ex.reps,
+            order: ex.order,
+          }
+        : ex
+    );
+    const hasBeenExecuted = await seriesQueries.hasExecutions(series.id);
+    if (hasBeenExecuted) {
+      await seriesQueries.createNewVersion(
+        series,
+        series.name,
+        updatedExercises
+      );
+    } else {
+      await seriesQueries.updateSeriesInPlace(
+        series.id,
+        series.name,
+        updatedExercises
+      );
+    }
+  }
+};
+
 module.exports = {
   createSeriesForUser,
   getSeriesForUser,
@@ -82,5 +133,6 @@ module.exports = {
   updateSeriesForUser,
   deleteSeriesForUser,
   getSeriesVersionsForUser,
-  getArchivedSeriesForUser, // Nova exportação
+  getArchivedSeriesForUser,
+  propagateExerciseUpdate,
 };

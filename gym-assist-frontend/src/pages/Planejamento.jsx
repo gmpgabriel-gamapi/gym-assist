@@ -1,6 +1,9 @@
-import React from "react";
+// [FRONTEND] arquivo: src/pages/Planejamento.jsx (MODIFICADO)
+import React, { useEffect } from "react"; // Adicionado useEffect
 import styled from "styled-components";
-import { Link } from "react-router-dom"; // Usaremos Link para navegação interna
+import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext"; // Adicionado useAuth
+import { getActivePlan } from "../services/trainingPlanService"; // Adicionado serviço
 
 const PageWrapper = styled.div`
   width: 100%;
@@ -24,10 +27,11 @@ const PlanningCard = styled(Link)`
   text-decoration: none;
   color: ${({ theme }) => theme.colors.text};
   transition: all 0.2s ease-in-out;
+  border: 1px solid transparent;
 
   &:hover {
     transform: translateY(-5px);
-    border: 1px solid ${({ theme }) => theme.colors.primary};
+    border-color: ${({ theme }) => theme.colors.primary};
   }
 
   h3 {
@@ -41,6 +45,17 @@ const PlanningCard = styled(Link)`
 `;
 
 function Planejamento() {
+  const { user } = useAuth();
+
+  // Garante que o plano de treino ativo exista ao visitar esta página
+  useEffect(() => {
+    if (user?.id) {
+      getActivePlan(user.id).catch((err) => {
+        console.error("Falha ao verificar/criar plano de treino ativo:", err);
+      });
+    }
+  }, [user]);
+
   return (
     <PageWrapper>
       <PageTitle>Central de Planejamento</PageTitle>
@@ -55,7 +70,11 @@ function Planejamento() {
           <p>Crie e edite suas séries de treino para montar seus planos.</p>
         </PlanningCard>
 
-        {/* Futuramente, um card para "Montar Plano de Treino" */}
+        {/* --- ADIÇÃO DO NOVO CARD --- */}
+        <PlanningCard to="/plano-de-treino/editor">
+          <h3>Montar Plano de Treino</h3>
+          <p>Organize suas séries em um plano de treino ativo.</p>
+        </PlanningCard>
       </PlanningGrid>
     </PageWrapper>
   );

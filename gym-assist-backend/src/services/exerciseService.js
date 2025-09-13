@@ -1,9 +1,8 @@
-// [BACKEND] arquivo: src/services/exerciseService.js (MODIFICADO)
+// [BACKEND] arquivo: src/services/exerciseService.js (VERSÃO 100% COMPLETA)
 const exerciseQueries = require("../db/exerciseQueries");
+const seriesService = require("./seriesService");
 
 const createCustomExercise = async (exerciseData) => {
-  // Nenhuma mudança necessária aqui, pois `exerciseData` já conterá os novos campos
-  // vindos do controller. Apenas garantimos que o objeto inteiro seja passado.
   const newExercise = await exerciseQueries.createCustomExercise(exerciseData);
   return newExercise;
 };
@@ -45,8 +44,29 @@ const updateCustomExercise = async (exerciseId, userId, updateData) => {
         "Acesso negado. Você não tem permissão para editar este exercício.",
     };
   }
-  // Nenhuma mudança necessária aqui, `updateData` já conterá os novos campos.
-  return exerciseQueries.updateCustomExercise(exerciseId, updateData);
+
+  const hasBeenExecuted = await exerciseQueries.hasExecutions(exerciseId);
+  let newExerciseVersion;
+
+  if (hasBeenExecuted) {
+    newExerciseVersion = await exerciseQueries.createNewVersion(
+      exercise,
+      updateData
+    );
+
+    // Inicia a cascata!
+    await seriesService.propagateExerciseUpdate(
+      exercise.id,
+      newExerciseVersion
+    );
+  } else {
+    newExerciseVersion = await exerciseQueries.updateInPlace(
+      exerciseId,
+      updateData
+    );
+  }
+
+  return newExerciseVersion;
 };
 
 const deleteCustomExercise = async (exerciseId, userId) => {

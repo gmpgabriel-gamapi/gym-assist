@@ -1,4 +1,4 @@
-// [FRONTEND] arquivo: src/AppRoutes.jsx (VERSÃO COMPLETA)
+// [FRONTEND] arquivo: src/AppRoutes.jsx (MODIFICADO)
 import { Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -14,6 +14,7 @@ import StudentHub from "./pages/StudentHub";
 import ProtectedRoute from "./router/ProtectedRoute";
 import SeriesList from "./pages/SeriesList";
 import ArchivedSeriesList from "./pages/ArchivedSeriesList";
+import TrainingPlanEditor from "./pages/TrainingPlanEditor"; // 1. Importa a nova página
 
 function AppRoutes() {
   const DashboardContent = () => (
@@ -122,6 +123,15 @@ function AppRoutes() {
           element={
             <Layout>
               <WorkoutPlayer />
+            </Layout>
+          }
+        />
+        {/* --- MODIFICAÇÃO: Rota atualizada --- */}
+        <Route
+          path="/plano-de-treino/editor"
+          element={
+            <Layout>
+              <TrainingPlanEditor />
             </Layout>
           }
         />

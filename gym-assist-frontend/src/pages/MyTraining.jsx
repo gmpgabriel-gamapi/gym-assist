@@ -1,8 +1,9 @@
+// [FRONTEND] arquivo: src/pages/MyTraining.jsx (CORRIGIDO)
 import { useMemo, useEffect, useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { getAllSeries } from "../services/seriesService";
+import { getActivePlan } from "../services/trainingPlanService"; // MODIFICAÇÃO: Importa o serviço correto
 import SeriesCard from "../components/training/SeriesCard";
 
 const PageWrapper = styled.div`
@@ -43,7 +44,7 @@ function MyTraining() {
   const { user, viewingProfile } = useAuth();
   const navigate = useNavigate();
 
-  const [activePlan, setActivePlan] = useState({ series: [] });
+  const [activePlan, setActivePlan] = useState(null); // Inicia como null
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -52,15 +53,12 @@ function MyTraining() {
   useEffect(() => {
     if (!profileToView) return;
 
-    const fetchSeries = async () => {
+    const fetchActivePlan = async () => {
       try {
         setLoading(true);
-        const seriesData = await getAllSeries(profileToView.id);
-        setActivePlan({
-          series: seriesData,
-          sequencingMode: "loop",
-          lastCompletedSeriesId: null, // Mock por enquanto
-        });
+        // MODIFICAÇÃO: Chama o serviço correto para buscar (e criar se não existir) o plano ativo
+        const planData = await getActivePlan(profileToView.id);
+        setActivePlan(planData);
       } catch (err) {
         setError("Falha ao buscar o plano de treino.");
         console.error(err);
@@ -69,10 +67,11 @@ function MyTraining() {
       }
     };
 
-    fetchSeries();
+    fetchActivePlan();
   }, [profileToView]);
 
   const workoutOfTheDayId = useMemo(() => {
+    if (!activePlan) return null;
     const { series, sequencingMode, lastCompletedSeriesId } = activePlan;
     if (sequencingMode === "loop" && series?.length > 0) {
       const lastIndex = series.findIndex((s) => s.id === lastCompletedSeriesId);
@@ -87,6 +86,7 @@ function MyTraining() {
 
   if (loading) return <p>Carregando plano de treino...</p>;
   if (error) return <p style={{ color: "#E53E3E" }}>Erro: {error}</p>;
+  if (!activePlan) return <p>Nenhum plano de treino encontrado.</p>;
 
   return (
     <PageWrapper>
@@ -101,13 +101,17 @@ function MyTraining() {
         )}
       </PageHeader>
 
-      {(activePlan.series || []).map((s) => (
-        <SeriesCard
-          key={s.id}
-          series={s}
-          isSuggested={s.id === workoutOfTheDayId}
-        />
-      ))}
+      {(activePlan.series || []).length > 0 ? (
+        (activePlan.series || []).map((s) => (
+          <SeriesCard
+            key={s.id}
+            series={s}
+            isSuggested={s.id === workoutOfTheDayId}
+          />
+        ))
+      ) : (
+        <p>Nenhuma série foi adicionada a este plano de treino ainda.</p>
+      )}
     </PageWrapper>
   );
 }

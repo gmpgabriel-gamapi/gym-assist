@@ -1,6 +1,8 @@
+// [FRONTEND] arquivo: src/components/training/SeriesCard.jsx (MODIFICADO)
 import { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
+import { getSeriesById } from "../../services/seriesService"; // Importa o serviço
 import ExerciseCard from "./ExerciseCard";
 
 const CardWrapper = styled.div`
@@ -76,13 +78,42 @@ const ExercisesList = styled.div`
   border-top: 1px solid ${({ theme }) => theme.colors.background};
 `;
 
+const InfoText = styled.p`
+  color: ${({ theme }) => theme.colors.textSecondary};
+  font-style: italic;
+  font-size: 0.9rem;
+`;
+
 function SeriesCard({ series, isSuggested }) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [detailedSeries, setDetailedSeries] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
+
+  const handleExpandToggle = async () => {
+    const nextIsExpanded = !isExpanded;
+    setIsExpanded(nextIsExpanded);
+
+    // Busca os dados apenas na primeira vez que o card é expandido
+    if (nextIsExpanded && !detailedSeries) {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const data = await getSeriesById(series.id);
+        setDetailedSeries(data);
+      } catch (err) {
+        setError("Não foi possível carregar os exercícios.");
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
 
   return (
     <CardWrapper>
-      <CardHeader onClick={() => setIsExpanded(!isExpanded)}>
+      <CardHeader onClick={handleExpandToggle}>
         <Title>{series.name}</Title>
         <HeaderControls>
           {isSuggested && <SuggestedTag>Sugerido</SuggestedTag>}
@@ -101,9 +132,15 @@ function SeriesCard({ series, isSuggested }) {
       </CardHeader>
       {isExpanded && (
         <ExercisesList>
-          {(series.exercises || []).map((ex) => (
-            <ExerciseCard key={ex.id} exercise={ex} />
-          ))}
+          {isLoading && <InfoText>Carregando exercícios...</InfoText>}
+          {error && <InfoText style={{ color: "#E53E3E" }}>{error}</InfoText>}
+          {detailedSeries && detailedSeries.exercises.length === 0 && (
+            <InfoText>Esta série não possui exercícios.</InfoText>
+          )}
+          {detailedSeries &&
+            detailedSeries.exercises.map((ex) => (
+              <ExerciseCard key={ex.id} exercise={ex} />
+            ))}
         </ExercisesList>
       )}
     </CardWrapper>
